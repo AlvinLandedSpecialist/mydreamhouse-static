@@ -15,6 +15,19 @@
     #map { height: 400px; width: 100%; }
     .project-list { padding: 20px; }
     .pagination { justify-content: center; }
+    .floating-buttons {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .floating-buttons a {
+      padding: 12px 16px;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
@@ -34,90 +47,7 @@
     </nav>
   </div>
 
-  <!-- Leaflet + Bootstrap -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-  <script>
-    // 假设这是从数据库获取的项目数据（可以用 AJAX 替换）
-    const projects = [
-      { id: 'project-a', title: '项目 A', desc: '吉隆坡市中心，3房2厅', img: 'https://via.placeholder.com/300x200', lat: 3.139, lng: 101.6869 },
-      { id: 'project-b', title: '项目 B', desc: '八打灵再也高层住宅', img: 'https://via.placeholder.com/300x200', lat: 3.105, lng: 101.640 },
-      { id: 'project-c', title: '项目 C', desc: '梳邦再也永久地契', img: 'https://via.placeholder.com/300x200', lat: 3.073, lng: 101.518 },
-      { id: 'project-d', title: '项目 D', desc: '双威城近捷运', img: 'https://via.placeholder.com/300x200', lat: 3.072, lng: 101.607 },
-      { id: 'project-e', title: '项目 E', desc: '沙登新区住宅', img: 'https://via.placeholder.com/300x200', lat: 3.020, lng: 101.700 },
-      { id: 'project-f', title: '项目 F', desc: '赛城绿意洋房', img: 'https://via.placeholder.com/300x200', lat: 2.950, lng: 101.661 },
-      { id: 'project-g', title: '项目 G', desc: '蒲种实惠公寓', img: 'https://via.placeholder.com/300x200', lat: 3.045, lng: 101.629 },
-      { id: 'project-h', title: '项目 H', desc: '吉隆坡南区全新项目', img: 'https://via.placeholder.com/300x200', lat: 3.080, lng: 101.680 },
-    ];
-
-    // 分页逻辑
-    let currentPage = 1;
-    const pageSize = 6;
-
-    function renderProjects() {
-      const container = document.getElementById('project-container');
-      container.innerHTML = '';
-
-      const start = (currentPage - 1) * pageSize;
-      const end = start + pageSize;
-      const pageProjects = projects.slice(start, end);
-
-      pageProjects.forEach(p => {
-        const col = document.createElement('div');
-        col.className = 'col';
-        col.id = p.id;
-        col.innerHTML = `
-          <div class="card">
-            <img src="${p.img}" class="card-img-top" alt="${p.title}">
-            <div class="card-body">
-              <h5 class="card-title">${p.title}</h5>
-              <p class="card-text">${p.desc}</p>
-              <a href="#" class="btn btn-primary">查看详情</a>
-            </div>
-          </div>
-        `;
-        container.appendChild(col);
-      });
-    }
-
-    document.getElementById('prevPage').addEventListener('click', e => {
-      e.preventDefault();
-      if (currentPage > 1) {
-        currentPage--;
-        renderProjects();
-      }
-    });
-
-    document.getElementById('nextPage').addEventListener('click', e => {
-      e.preventDefault();
-      if (currentPage < Math.ceil(projects.length / pageSize)) {
-        currentPage++;
-        renderProjects();
-      }
-    });
-
-    renderProjects(); // 初始加载第一页
-
-    // 地图初始化与 Marker 跳转逻辑
-    const map = L.map('map').setView([3.139, 101.6869], 11);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
-
-    projects.forEach(p => {
-      const marker = L.marker([p.lat, p.lng]).addTo(map)
-        .bindPopup(`${p.title}（点击跳转）`)
-        .on('click', () => {
-          const target = document.getElementById(p.id);
-          if (target) {
-            target.scrollIntoView({ behavior: 'smooth' });
-          } else {
-            alert('项目当前不在本页，请切换分页查看。');
-          }
-        });
-    });
-  </script>
-</body>
-</html>
+  <!-- 浮动按钮区域 -->
+  <div class="floating-buttons">
+    <a href="https://wa.me/60169583621" target="_blank" class="btn btn-success">📞 WhatsApp 联系我</a>
+    <a href="#calculator" class="btn btn-primary
