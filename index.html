@@ -56,7 +56,7 @@
   <script>
     let projects = [];
     async function loadProjects() {
-      const res = await fetch('/api/projects');
+      const res = await fetch('https://mydreamhouse-backend.onrender.com/api/projects');
       projects = await res.json();
       populateFilters(); renderProjects(); renderMap();
     }
