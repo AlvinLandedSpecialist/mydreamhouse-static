@@ -11,115 +11,32 @@
       margin: 0;
       padding: 0;
     }
-    #map {
-      height: 400px;
-      width: 100%;
-    }
-    .filter {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin: 10px;
-    }
-    .filter select {
-      padding: 8px;
-      border-radius: 6px;
-    }
-    .projects {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      padding: 10px;
-    }
-    .project {
-      flex: 0 0 calc(33.333% - 20px);
-      background: #f9f9f9;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      cursor: pointer;
-    }
-    .pagination {
-      text-align: center;
-      margin: 20px 0;
-    }
-    .pagination button {
-      padding: 5px 10px;
-      margin: 0 2px;
-    }
-    .whatsapp-float {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: #25d366;
-      color: white;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      font-size: 28px;
-      text-align: center;
-      line-height: 60px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-      z-index: 999;
-      text-decoration: none;
-    }
-    .calculator-float {
-      position: fixed;
-      bottom: 100px;
-      right: 20px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      font-size: 28px;
-      text-align: center;
-      line-height: 60px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-      cursor: pointer;
-      z-index: 999;
-    }
-    .calculator-popup {
-      display: none;
-      position: fixed;
-      bottom: 180px;
-      right: 20px;
-      width: 280px;
-      background: white;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 15px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-      z-index: 999;
-    }
-    .calculator-popup input {
-      width: 100%;
-      padding: 6px;
-      margin: 5px 0;
-    }
-    .calculator-popup button {
-      width: 100%;
-      padding: 8px;
-      margin-top: 10px;
-      background-color: #28a745;
-      color: white;
-      border: none;
-      border-radius: 6px;
-    }
-    .result {
-      text-align: center;
-      margin-top: 10px;
-    }
+    #map { height: 400px; width: 100%; }
+    .filter { display: flex; justify-content: center; gap: 10px; margin: 10px; }
+    .filter select { padding: 8px; border-radius: 6px; }
+    .projects { display: flex; flex-wrap: wrap; gap: 10px; padding: 10px; }
+    .project { flex: 0 0 calc(33.333% - 20px); background: #f9f9f9; border: 1px solid #ddd; border-radius: 8px; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; }
+    .pagination { text-align: center; margin: 20px 0; }
+    .pagination button { padding: 5px 10px; margin: 0 2px; }
+    .whatsapp-float { position: fixed; bottom: 20px; right: 20px; background-color: #25d366; color: white; border-radius: 50%; width: 60px; height: 60px; font-size: 28px; text-align: center; line-height: 60px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); z-index: 999; text-decoration: none; }
+    .calculator-float { position: fixed; bottom: 100px; right: 20px; background-color: #007bff; color: white; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 28px; text-align: center; line-height: 60px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); cursor: pointer; z-index: 999; }
+    .calculator-popup { display: none; position: fixed; bottom: 180px; right: 20px; width: 280px; background: white; border: 1px solid #ccc; border-radius: 10px; padding: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 999; }
+    .calculator-popup input { width: 100%; padding: 6px; margin: 5px 0; }
+    .calculator-popup button { width: 100%; padding: 8px; margin-top: 10px; background-color: #28a745; color: white; border: none; border-radius: 6px; }
+    .result { text-align: center; margin-top: 10px; }
+    .lang-switch { position: fixed; top: 10px; right: 20px; }
   </style>
 </head>
 <body>
+  <div class="lang-switch">
+    <select id="langSelect" onchange="switchLang()">
+      <option value="en">English</option>
+      <option value="zh">中文</option>
+    </select>
+  </div>
   <div id="map"></div>
   <div class="filter">
-    <select id="areaFilter" onchange="applyFilter()">
-      <option value="all">全部地区</option>
-    </select>
+    <select id="areaFilter" onchange="applyFilter()"><option value="all">全部地区</option></select>
   </div>
   <div class="projects" id="projectList"></div>
   <div class="pagination" id="pagination"></div>
@@ -127,107 +44,56 @@
   <a href="https://wa.me/60169583621?text=我对您的房产项目感兴趣" target="_blank" class="whatsapp-float">💬</a>
   <button class="calculator-float" onclick="toggleCalculator()">🧮</button>
   <div class="calculator-popup" id="calculatorBox">
-    <h3 style="text-align:center;">房贷计算器</h3>
-    <label>房价 (RM):</label>
-    <input type="number" id="price" />
-    <label>年利率 (%):</label>
-    <input type="number" id="rate" step="0.01" />
-    <label>贷款年限:</label>
-    <input type="number" id="years" />
-    <button onclick="calculateLoan()">计算</button>
+    <h3 id="calcTitle">房贷计算器</h3>
+    <label id="labelPrice">房价 (RM):</label><input type="number" id="price" />
+    <label id="labelRate">年利率 (%):</label><input type="number" id="rate" step="0.01" />
+    <label id="labelYears">贷款年限:</label><input type="number" id="years" />
+    <button onclick="calculateLoan()" id="calcButton">计算</button>
     <div id="loanResult" class="result"></div>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    const projects = [
-      { name: "Cyberjaya Project", lat: 2.9226, lng: 101.6500, area: "Cyberjaya", link: "/project/Cyberjaya-Project" },
-      { name: "Banting Project", lat: 2.8137, lng: 101.5022, area: "Banting", link: "/project/Banting-Project" },
-      { name: "Kajang Project", lat: 2.9927, lng: 101.7871, area: "Kajang", link: "/project/Kajang-Project" },
-      { name: "Bangi Project", lat: 2.9448, lng: 101.7821, area: "Bangi", link: "/project/Bangi-Project" },
-      { name: "Semenyih Project", lat: 2.9481, lng: 101.8449, area: "Semenyih", link: "/project/Semenyih-Project" },
-      { name: "Puchong Project", lat: 3.0322, lng: 101.6167, area: "Puchong", link: "/project/Puchong-Project" },
-      { name: "Klang Project", lat: 3.0339, lng: 101.4455, area: "Klang", link: "/project/Klang-Project" },
-      { name: "Shah Alam Project", lat: 3.0738, lng: 101.5183, area: "Shah Alam", link: "/project/Shah-Alam-Project" },
-      { name: "Rawang Project", lat: 3.3181, lng: 101.5767, area: "Rawang", link: "/project/Rawang-Project" },
-      { name: "Sungai Buloh Project", lat: 3.2131, lng: 101.5778, area: "Sungai Buloh", link: "/project/Sungai-Buloh-Project" }
-    ];
-
-    const map = L.map('map').setView([3.05, 101.7], 10);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-
-    const markers = [];
-    projects.forEach((project) => {
-      const marker = L.marker([project.lat, project.lng]).addTo(map);
-      marker.on('click', () => {
-        window.location.href = project.link;
-      });
-      markers.push({ marker, area: project.area });
-    });
-
-    const areaFilter = document.getElementById('areaFilter');
-    const uniqueAreas = [...new Set(projects.map(p => p.area))];
-    uniqueAreas.forEach(area => {
-      const opt = document.createElement('option');
-      opt.value = area;
-      opt.textContent = area;
-      areaFilter.appendChild(opt);
-    });
-
-    let currentPage = 1;
-    function renderProjects(page = 1, filter = 'all') {
-      currentPage = page;
-      const filtered = filter === 'all' ? projects : projects.filter(p => p.area === filter);
-      const start = (page - 1) * 6;
-      const end = start + 6;
-      const list = document.getElementById('projectList');
-      list.innerHTML = '';
-      filtered.slice(start, end).forEach((p, i) => {
-        const div = document.createElement('div');
-        div.className = 'project';
-        div.innerHTML = `<h4>${p.name}</h4><p>地区: ${p.area}</p>`;
-        div.onclick = () => window.location.href = p.link;
-        list.appendChild(div);
-      });
-
-      const pagination = document.getElementById('pagination');
-      pagination.innerHTML = '';
-      const totalPages = Math.ceil(filtered.length / 6);
-      for (let i = 1; i <= totalPages; i++) {
-        const btn = document.createElement('button');
-        btn.textContent = i;
-        btn.onclick = () => renderProjects(i, filter);
-        if (i === currentPage) {
-          btn.style.fontWeight = 'bold';
-          btn.style.backgroundColor = '#007bff';
-          btn.style.color = '#fff';
-        }
-        pagination.appendChild(btn);
-      }
+    let projects = [];
+    async function loadProjects() {
+      const res = await fetch('/api/projects');
+      projects = await res.json();
+      populateFilters(); renderProjects(); renderMap();
     }
-
-    function applyFilter() {
-      const value = areaFilter.value;
-      renderProjects(1, value);
+    function populateFilters() {
+      const areas = [...new Set(projects.map(p=>p.area))];
+      const areaFilter = document.getElementById('areaFilter');
+      areas.forEach(a=>{ let o=new Option(a,a); areaFilter.add(o); });
     }
-
-    renderProjects();
-
-    function toggleCalculator() {
-      const calc = document.getElementById('calculatorBox');
-      calc.style.display = (calc.style.display === 'block') ? 'none' : 'block';
+    let map;
+    function renderMap() {
+      if (!map) map = L.map('map').setView([3.05,101.7],10);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ attribution:'© OSM' }).addTo(map);
+      projects.forEach(p=>{ L.marker([p.lat,p.lng]).addTo(map).on('click',()=>{ window.location.href=p.link; }); });
     }
-
-    function calculateLoan() {
-      const price = parseFloat(document.getElementById('price').value);
-      const rate = parseFloat(document.getElementById('rate').value) / 100 / 12;
-      const years = parseInt(document.getElementById('years').value);
-      const n = years * 12;
-      const monthly = (price * rate * Math.pow(1 + rate, n)) / (Math.pow(1 + rate, n) - 1);
-      document.getElementById('loanResult').innerHTML = isFinite(monthly) ? `每月还款: RM ${monthly.toFixed(2)}` : '请输入有效的数值';
+    let currentPage=1; const perPage=6;
+    function renderProjects(page=1) {
+      currentPage=page; const filter=areaFilter.value;
+      let list=projects.filter(p=>filter==='all'||p.area===filter);
+      const start=(page-1)*perPage, end=start+perPage;
+      const container=document.getElementById('projectList'); container.innerHTML='';
+      list.slice(start,end).forEach(p=>{ let d=document.createElement('div'); d.className='project'; d.innerHTML=`<h4 data-i18n="${p.name}">${p.name}</h4><p>地区: ${p.area}</p>`; d.onclick=()=>window.location.href=p.link; container.appendChild(d); });
+      const pag=document.getElementById('pagination'); pag.innerHTML='';
+      for(let i=1;i<=Math.ceil(list.length/perPage);i++){let b=document.createElement('button');b.textContent=i; b.onclick=()=>renderProjects(i); if(i===page){b.style.fontWeight='bold';} pag.appendChild(b);}    }
+    function applyFilter(){ renderProjects(1); }
+    function toggleCalculator(){ let c=document.getElementById('calculatorBox'); c.style.display=c.style.display==='block'?'none':'block'; }
+    function calculateLoan(){ const price=parseFloat(price.value), rate=parseFloat(rate.value)/100/12, years=parseInt(years.value), n=years*12;
+      const m=(price*rate*Math.pow(1+rate,n))/(Math.pow(1+rate,n)-1);
+      loanResult.textContent=isFinite(m)?`每月还款: RM ${m.toFixed(2)}`:'请输入有效数值'; }
+    function switchLang(){ const lang=langSelect.value;
+      document.documentElement.lang=lang;
+      document.getElementById('calcTitle').textContent=lang==='zh'?'房贷计算器':'Loan Calculator';
+      document.getElementById('labelPrice').textContent=lang==='zh'?'房价 (RM):':'Price (RM):';
+      document.getElementById('labelRate').textContent=lang==='zh'?'年利率 (%):':'Annual Rate (%):';
+      document.getElementById('labelYears').textContent=lang==='zh'?'贷款年限:':'Years:';
+      document.getElementById('calcButton').textContent=lang==='zh'?'计算':'Calculate';
     }
+    loadProjects();
   </script>
 </body>
 </html>
