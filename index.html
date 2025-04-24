@@ -1,123 +1,233 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>房产地图分页展示</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Leaflet -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Dream House</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
   <style>
-    body { margin: 0; padding: 0; }
-    #map { height: 400px; width: 100%; }
-    .project-list { padding: 20px; }
-    .pagination { justify-content: center; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    #map {
+      height: 400px;
+      width: 100%;
+    }
+    .filter {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 10px;
+    }
+    .filter select {
+      padding: 8px;
+      border-radius: 6px;
+    }
+    .projects {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 10px;
+    }
+    .project {
+      flex: 0 0 calc(33.333% - 20px);
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      cursor: pointer;
+    }
+    .pagination {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .pagination button {
+      padding: 5px 10px;
+      margin: 0 2px;
+    }
+    .whatsapp-float {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #25d366;
+      color: white;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 28px;
+      text-align: center;
+      line-height: 60px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      z-index: 999;
+      text-decoration: none;
+    }
+    .calculator-float {
+      position: fixed;
+      bottom: 100px;
+      right: 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 28px;
+      text-align: center;
+      line-height: 60px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      cursor: pointer;
+      z-index: 999;
+    }
+    .calculator-popup {
+      display: none;
+      position: fixed;
+      bottom: 180px;
+      right: 20px;
+      width: 280px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      z-index: 999;
+    }
+    .calculator-popup input {
+      width: 100%;
+      padding: 6px;
+      margin: 5px 0;
+    }
+    .calculator-popup button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 10px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+    }
+    .result {
+      text-align: center;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
-
-  <!-- 地图区域 -->
   <div id="map"></div>
+  <div class="filter">
+    <select id="areaFilter" onchange="applyFilter()">
+      <option value="all">全部地区</option>
+    </select>
+  </div>
+  <div class="projects" id="projectList"></div>
+  <div class="pagination" id="pagination"></div>
 
-  <!-- 房产项目列表 -->
-  <div class="container project-list">
-    <h2 class="mb-4">精选房地产项目</h2>
-    <div class="row row-cols-1 row-cols-md-3 g-4" id="project-container"></div>
-    <nav>
-      <ul class="pagination mt-4">
-        <li class="page-item"><a class="page-link" href="#" id="prevPage">上一页</a></li>
-        <li class="page-item"><a class="page-link" href="#" id="nextPage">下一页</a></li>
-      </ul>
-    </nav>
+  <a href="https://wa.me/60169583621?text=我对您的房产项目感兴趣" target="_blank" class="whatsapp-float">💬</a>
+  <button class="calculator-float" onclick="toggleCalculator()">🧮</button>
+  <div class="calculator-popup" id="calculatorBox">
+    <h3 style="text-align:center;">房贷计算器</h3>
+    <label>房价 (RM):</label>
+    <input type="number" id="price" />
+    <label>年利率 (%):</label>
+    <input type="number" id="rate" step="0.01" />
+    <label>贷款年限:</label>
+    <input type="number" id="years" />
+    <button onclick="calculateLoan()">计算</button>
+    <div id="loanResult" class="result"></div>
   </div>
 
-  <!-- Leaflet + Bootstrap -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
   <script>
-    // 假设这是从数据库获取的项目数据（可以用 AJAX 替换）
     const projects = [
-      { id: 'project-a', title: '项目 A', desc: '吉隆坡市中心，3房2厅', img: 'https://via.placeholder.com/300x200', lat: 3.139, lng: 101.6869 },
-      { id: 'project-b', title: '项目 B', desc: '八打灵再也高层住宅', img: 'https://via.placeholder.com/300x200', lat: 3.105, lng: 101.640 },
-      { id: 'project-c', title: '项目 C', desc: '梳邦再也永久地契', img: 'https://via.placeholder.com/300x200', lat: 3.073, lng: 101.518 },
-      { id: 'project-d', title: '项目 D', desc: '双威城近捷运', img: 'https://via.placeholder.com/300x200', lat: 3.072, lng: 101.607 },
-      { id: 'project-e', title: '项目 E', desc: '沙登新区住宅', img: 'https://via.placeholder.com/300x200', lat: 3.020, lng: 101.700 },
-      { id: 'project-f', title: '项目 F', desc: '赛城绿意洋房', img: 'https://via.placeholder.com/300x200', lat: 2.950, lng: 101.661 },
-      { id: 'project-g', title: '项目 G', desc: '蒲种实惠公寓', img: 'https://via.placeholder.com/300x200', lat: 3.045, lng: 101.629 },
-      { id: 'project-h', title: '项目 H', desc: '吉隆坡南区全新项目', img: 'https://via.placeholder.com/300x200', lat: 3.080, lng: 101.680 },
+      { name: "Cyberjaya Project", lat: 2.9226, lng: 101.6500, area: "Cyberjaya", link: "/project/Cyberjaya-Project" },
+      { name: "Banting Project", lat: 2.8137, lng: 101.5022, area: "Banting", link: "/project/Banting-Project" },
+      { name: "Kajang Project", lat: 2.9927, lng: 101.7871, area: "Kajang", link: "/project/Kajang-Project" },
+      { name: "Bangi Project", lat: 2.9448, lng: 101.7821, area: "Bangi", link: "/project/Bangi-Project" },
+      { name: "Semenyih Project", lat: 2.9481, lng: 101.8449, area: "Semenyih", link: "/project/Semenyih-Project" },
+      { name: "Puchong Project", lat: 3.0322, lng: 101.6167, area: "Puchong", link: "/project/Puchong-Project" },
+      { name: "Klang Project", lat: 3.0339, lng: 101.4455, area: "Klang", link: "/project/Klang-Project" },
+      { name: "Shah Alam Project", lat: 3.0738, lng: 101.5183, area: "Shah Alam", link: "/project/Shah-Alam-Project" },
+      { name: "Rawang Project", lat: 3.3181, lng: 101.5767, area: "Rawang", link: "/project/Rawang-Project" },
+      { name: "Sungai Buloh Project", lat: 3.2131, lng: 101.5778, area: "Sungai Buloh", link: "/project/Sungai-Buloh-Project" }
     ];
 
-    // 分页逻辑
-    let currentPage = 1;
-    const pageSize = 6;
-
-    function renderProjects() {
-      const container = document.getElementById('project-container');
-      container.innerHTML = '';
-
-      const start = (currentPage - 1) * pageSize;
-      const end = start + pageSize;
-      const pageProjects = projects.slice(start, end);
-
-      pageProjects.forEach(p => {
-        const col = document.createElement('div');
-        col.className = 'col';
-        col.id = p.id;
-        col.innerHTML = `
-          <div class="card">
-            <img src="${p.img}" class="card-img-top" alt="${p.title}">
-            <div class="card-body">
-              <h5 class="card-title">${p.title}</h5>
-              <p class="card-text">${p.desc}</p>
-              <a href="#" class="btn btn-primary">查看详情</a>
-            </div>
-          </div>
-        `;
-        container.appendChild(col);
-      });
-    }
-
-    document.getElementById('prevPage').addEventListener('click', e => {
-      e.preventDefault();
-      if (currentPage > 1) {
-        currentPage--;
-        renderProjects();
-      }
-    });
-
-    document.getElementById('nextPage').addEventListener('click', e => {
-      e.preventDefault();
-      if (currentPage < Math.ceil(projects.length / pageSize)) {
-        currentPage++;
-        renderProjects();
-      }
-    });
-
-    renderProjects(); // 初始加载第一页
-
-    // 地图初始化与 Marker 跳转逻辑
-    const map = L.map('map').setView([3.139, 101.6869], 11);
-
+    const map = L.map('map').setView([3.05, 101.7], 10);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
+      attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    projects.forEach(p => {
-      const marker = L.marker([p.lat, p.lng]).addTo(map)
-        .bindPopup(`${p.title}（点击跳转）`)
-        .on('click', () => {
-          const target = document.getElementById(p.id);
-          if (target) {
-            target.scrollIntoView({ behavior: 'smooth' });
-          } else {
-            alert('项目当前不在本页，请切换分页查看。');
-          }
-        });
+    const markers = [];
+    projects.forEach((project) => {
+      const marker = L.marker([project.lat, project.lng]).addTo(map);
+      marker.on('click', () => {
+        window.location.href = project.link;
+      });
+      markers.push({ marker, area: project.area });
     });
+
+    const areaFilter = document.getElementById('areaFilter');
+    const uniqueAreas = [...new Set(projects.map(p => p.area))];
+    uniqueAreas.forEach(area => {
+      const opt = document.createElement('option');
+      opt.value = area;
+      opt.textContent = area;
+      areaFilter.appendChild(opt);
+    });
+
+    let currentPage = 1;
+    function renderProjects(page = 1, filter = 'all') {
+      currentPage = page;
+      const filtered = filter === 'all' ? projects : projects.filter(p => p.area === filter);
+      const start = (page - 1) * 6;
+      const end = start + 6;
+      const list = document.getElementById('projectList');
+      list.innerHTML = '';
+      filtered.slice(start, end).forEach((p, i) => {
+        const div = document.createElement('div');
+        div.className = 'project';
+        div.innerHTML = `<h4>${p.name}</h4><p>地区: ${p.area}</p>`;
+        div.onclick = () => window.location.href = p.link;
+        list.appendChild(div);
+      });
+
+      const pagination = document.getElementById('pagination');
+      pagination.innerHTML = '';
+      const totalPages = Math.ceil(filtered.length / 6);
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        btn.onclick = () => renderProjects(i, filter);
+        if (i === currentPage) {
+          btn.style.fontWeight = 'bold';
+          btn.style.backgroundColor = '#007bff';
+          btn.style.color = '#fff';
+        }
+        pagination.appendChild(btn);
+      }
+    }
+
+    function applyFilter() {
+      const value = areaFilter.value;
+      renderProjects(1, value);
+    }
+
+    renderProjects();
+
+    function toggleCalculator() {
+      const calc = document.getElementById('calculatorBox');
+      calc.style.display = (calc.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function calculateLoan() {
+      const price = parseFloat(document.getElementById('price').value);
+      const rate = parseFloat(document.getElementById('rate').value) / 100 / 12;
+      const years = parseInt(document.getElementById('years').value);
+      const n = years * 12;
+      const monthly = (price * rate * Math.pow(1 + rate, n)) / (Math.pow(1 + rate, n) - 1);
+      document.getElementById('loanResult').innerHTML = isFinite(monthly) ? `每月还款: RM ${monthly.toFixed(2)}` : '请输入有效的数值';
+    }
   </script>
 </body>
 </html>
