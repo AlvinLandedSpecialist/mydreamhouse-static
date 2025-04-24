@@ -55,4 +55,45 @@
       <div id="project-3" class="card mb-4 project-card">
         <div class="card-body">
           <h5 class="card-title">Setia EcoHill</h5>
-          <p>生态园区别
+          <p>生态园区别墅区，RM1,200,000 起。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-oD1A6zPHzQijKf9pBv7T2syY+l0kA7Fk0qsaSsh90Ck="
+    crossorigin=""
+  ></script>
+
+  <script>
+    // 调试输出地图容器高度
+    console.log("地图容器高度: ", document.getElementById("map").style.height);
+    
+    // 初始化地图
+    const map = L.map('map').setView([3.139, 101.6869], 10);
+
+    // 加载地图图层
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // 示例项目数据
+    const projects = [
+      { id: 1, name: "Damansara Residences", lat: 3.15, lng: 101.63 },
+      { id: 2, name: "Bukit Jalil Suites", lat: 3.05, lng: 101.68 },
+      { id: 3, name: "Setia EcoHill", lat: 2.98, lng: 101.85 }
+    ];
+
+    // 添加项目标记到地图
+    projects.forEach(p => {
+      L.marker([p.lat, p.lng])
+        .addTo(map)
+        .bindPopup(`<strong>${p.name}</strong><br><a href="#project-${p.id}">查看项目</a>`);
+    });
+  </script>
+
+</body>
+</html>
