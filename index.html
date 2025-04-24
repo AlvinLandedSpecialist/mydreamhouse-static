@@ -1,57 +1,27 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>我的房地产项目</title>
-  
-  <!-- Leaflet 地图 CSS -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-o9N1j1gkQnnkP2RBcz1zBCEV4nWwOY1gYdC38ZoJrD8="
-    crossorigin=""
-  />
-
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    #map {
-      height: 500px !important;  /* 强制设置地图容器高度 */
-      width: 100%;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>房地产门户</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="manifest" href="/manifest.json">
 </head>
 <body>
+  <!-- 地图容器 -->
+  <div id="map-container"></div>
+  
+  <!-- 项目展示区 -->
+  <div class="projects-grid" id="projects-container">
+    <!-- 动态加载项目 -->
+  </div>
 
-  <div id="map"></div>
+  <!-- WhatsApp浮动按钮 -->
+  <a href="#" class="whatsapp-float" id="whatsapp-btn">
+    <img src="/assets/images/logos/whatsapp.svg" alt="WhatsApp">
+  </a>
 
-  <!-- Leaflet JS -->
-  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-oD1A6zPHzQijKf9pBv7T2syY+l0kA7Fk0qsaSsh90Ck="
-    crossorigin=""
-  ></script>
-
-  <script>
-    window.onload = function() {
-      // 初始化地图并设置初始位置和缩放级别
-      const map = L.map('map').setView([3.139, 101.6869], 10);
-
-      // 加载 OpenStreetMap 图层
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
-      }).addTo(map);
-
-      // 在地图上添加一个标记
-      L.marker([3.139, 101.6869]).addTo(map)
-        .bindPopup('我的房地产项目')
-        .openPopup();
-    };
-  </script>
-
+  <script src="/assets/js/main.js" type="module"></script>
+  <script src="/assets/js/map.js" defer></script>
 </body>
 </html>
