@@ -159,7 +159,7 @@
           // 判断 Marker 属于哪一页
           if (currentPage !== p.page) {
             currentPage = p.page;
-            renderProjects();
+            renderProjects();  // 重新渲染页面
           }
           const target = document.getElementById(p.id);
           if (target) {
