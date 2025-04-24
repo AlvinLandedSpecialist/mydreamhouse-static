@@ -103,7 +103,6 @@
 
     let currentPage = 1;
     const pageSize = 6;
-
     let map;
     let markers = [];
 
@@ -132,39 +131,32 @@
     }
 
     function renderMap() {
-      // 初始化地图，如果地图已经存在则不重新创建
+      // 初始化地图
       if (!map) {
         map = L.map('map').setView([3.139, 101.6869], 11);
-
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '© OpenStreetMap contributors'
         }).addTo(map);
       }
 
-      // 清除已有的 markers
+      // 清除之前的 Marker
       markers.forEach(marker => map.removeLayer(marker));
       markers = [];
 
-      // 在地图上添加 marker
+      // 为当前页的每个项目添加 Marker
       projects.forEach(p => {
-        const marker = L.marker([p.lat, p.lng]).addTo(map)
-          .bindPopup(`${p.title}（点击跳转）`)
-          .on('click', () => {
-            // 判断 Marker 属于哪一页
-            if (currentPage !== p.page) {
-              currentPage = p.page;
-              renderProjects();  // 重新渲染页面
-              renderMap();       // 重新渲染地图
-            }
-            const target = document.getElementById(p.id);
-            if (target) {
-              target.scrollIntoView({ behavior: 'smooth' });
-            } else {
-              alert('项目当前不在本页，请切换分页查看。');
-            }
-          });
+        if (p.page === currentPage) {
+          const marker = L.marker([p.lat, p.lng]).addTo(map)
+            .bindPopup(`${p.title}（点击跳转）`)
+            .on('click', () => {
+              const target = document.getElementById(p.id);
+              if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+              }
+            });
 
-        markers.push(marker);
+          markers.push(marker);
+        }
       });
     }
 
@@ -188,24 +180,6 @@
 
     renderProjects();
     renderMap();
-
-    // 房贷计算器逻辑
-    document.getElementById('loanForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const price = parseFloat(document.getElementById('price').value);
-      const down = parseFloat(document.getElementById('downpayment').value);
-      const years = parseInt(document.getElementById('years').value);
-      const rate = parseFloat(document.getElementById('rate').value) / 100;
-
-      const loanAmount = price - down;
-      const monthlyRate = rate / 12;
-      const months = years * 12;
-      const monthlyPayment = loanAmount * monthlyRate / (1 - Math.pow(1 + monthlyRate, -months));
-
-      const resultDiv = document.getElementById('result');
-      resultDiv.classList.remove('d-none');
-      resultDiv.textContent = `每月供款大约：RM ${monthlyPayment.toFixed(2)}`;
-    });
   </script>
 </body>
 </html>
