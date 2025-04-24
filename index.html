@@ -91,14 +91,14 @@
 
   <script>
     const projects = [
-      { id: 'project-a', title: '项目 A', desc: '吉隆坡市中心，3房2厅', img: 'https://via.placeholder.com/300x200', lat: 3.139, lng: 101.6869 },
-      { id: 'project-b', title: '项目 B', desc: '八打灵再也高层住宅', img: 'https://via.placeholder.com/300x200', lat: 3.105, lng: 101.640 },
-      { id: 'project-c', title: '项目 C', desc: '梳邦再也永久地契', img: 'https://via.placeholder.com/300x200', lat: 3.073, lng: 101.518 },
-      { id: 'project-d', title: '项目 D', desc: '双威城近捷运', img: 'https://via.placeholder.com/300x200', lat: 3.072, lng: 101.607 },
-      { id: 'project-e', title: '项目 E', desc: '沙登新区住宅', img: 'https://via.placeholder.com/300x200', lat: 3.020, lng: 101.700 },
-      { id: 'project-f', title: '项目 F', desc: '赛城绿意洋房', img: 'https://via.placeholder.com/300x200', lat: 2.950, lng: 101.661 },
-      { id: 'project-g', title: '项目 G', desc: '蒲种实惠公寓', img: 'https://via.placeholder.com/300x200', lat: 3.045, lng: 101.629 },
-      { id: 'project-h', title: '项目 H', desc: '吉隆坡南区全新项目', img: 'https://via.placeholder.com/300x200', lat: 3.080, lng: 101.680 },
+      { id: 'project-a', title: '项目 A', desc: '吉隆坡市中心，3房2厅', img: 'https://via.placeholder.com/300x200', lat: 3.139, lng: 101.6869, page: 1 },
+      { id: 'project-b', title: '项目 B', desc: '八打灵再也高层住宅', img: 'https://via.placeholder.com/300x200', lat: 3.105, lng: 101.640, page: 1 },
+      { id: 'project-c', title: '项目 C', desc: '梳邦再也永久地契', img: 'https://via.placeholder.com/300x200', lat: 3.073, lng: 101.518, page: 1 },
+      { id: 'project-d', title: '项目 D', desc: '双威城近捷运', img: 'https://via.placeholder.com/300x200', lat: 3.072, lng: 101.607, page: 2 },
+      { id: 'project-e', title: '项目 E', desc: '沙登新区住宅', img: 'https://via.placeholder.com/300x200', lat: 3.020, lng: 101.700, page: 2 },
+      { id: 'project-f', title: '项目 F', desc: '赛城绿意洋房', img: 'https://via.placeholder.com/300x200', lat: 2.950, lng: 101.661, page: 2 },
+      { id: 'project-g', title: '项目 G', desc: '蒲种实惠公寓', img: 'https://via.placeholder.com/300x200', lat: 3.045, lng: 101.629, page: 3 },
+      { id: 'project-h', title: '项目 H', desc: '吉隆坡南区全新项目', img: 'https://via.placeholder.com/300x200', lat: 3.080, lng: 101.680, page: 3 },
     ];
 
     let currentPage = 1;
@@ -156,6 +156,11 @@
       const marker = L.marker([p.lat, p.lng]).addTo(map)
         .bindPopup(`${p.title}（点击跳转）`)
         .on('click', () => {
+          // 判断 Marker 属于哪一页
+          if (currentPage !== p.page) {
+            currentPage = p.page;
+            renderProjects();
+          }
           const target = document.getElementById(p.id);
           if (target) {
             target.scrollIntoView({ behavior: 'smooth' });
