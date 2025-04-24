@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>我的房地产项目</title>
+  
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Leaflet 地图 CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-o9N1j1gkQnnkP2RBcz1zBCEV4nWwOY1gYdC38ZoJrD8="
+    crossorigin=""
+  />
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+    }
+    #map {
+      height: 400px;
+      margin-bottom: 2rem;
+    }
+    .project-card {
+      scroll-margin-top: 80px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container mt-4">
+    <h2 class="mb-3">点击地图上的项目标记跳转查看</h2>
+    <!-- 地图容器 -->
+    <div id="map"></div>
+
+    <!-- 项目列表区块 -->
+    <div id="projects">
+      <div id="project-1" class="card mb-4 project-card">
+        <div class="card-body">
+          <h5 class="card-title">Damansara Residences</h5>
+          <p>高端住宅，靠近地铁，三房两厅 RM750,000 起。</p>
+        </div>
+      </div>
+
+      <div id="project-2" class="card mb-4 project-card">
+        <div class="card-body">
+          <h5 class="card-title">Bukit Jalil Suites</h5>
+          <p>市区核心，配套完善，RM680,000 起。</p>
+        </div>
+      </div>
+
+      <div id="project-3" class="card mb-4 project-card">
+        <div class="card-body">
+          <h5 class="card-title">Setia EcoHill</h5>
+          <p>生态园区别墅区，RM1,200,000 起。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-oD1A6zPHzQijKf9pBv7T2syY+l0kA7Fk0qsaSsh90Ck="
+    crossorigin=""
+  ></script>
+
+  <script>
+    const map = L.map('map').setView([3.139, 101.6869], 10);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    const projects = [
+      { id: 1, name: "Damansara Residences", lat: 3.15, lng: 101.63 },
+      { id: 2, name: "Bukit Jalil Suites", lat: 3.05, lng: 101.68 },
+      { id: 3, name: "Setia EcoHill", lat: 2.98, lng: 101.85 }
+    ];
+
+    projects.forEach(p => {
+      L.marker([p.lat, p.lng])
+        .addTo(map)
+        .bindPopup(`<strong>${p.name}</strong><br><a href="#project-${p.id}">查看项目</a>`);
+    });
+  </script>
+
+</body>
+</html>
