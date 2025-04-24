@@ -21,7 +21,7 @@
       font-family: 'Segoe UI', sans-serif;
     }
     #map {
-      height: 500px; /* 增加地图的高度确保其显示 */
+      height: 500px; /* 确保地图容器有足够的高度 */
       margin-bottom: 2rem;
     }
     .project-card {
@@ -69,30 +69,29 @@
   ></script>
 
   <script>
-    // 调试输出地图容器高度
-    console.log("地图容器高度: ", document.getElementById("map").style.height);
-    
-    // 初始化地图
-    const map = L.map('map').setView([3.139, 101.6869], 10);
+    // 确保页面完全加载后再初始化地图
+    window.onload = function() {
+      const map = L.map('map').setView([3.139, 101.6869], 10);
 
-    // 加载地图图层
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
-    }).addTo(map);
+      // 加载地图图层
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
+      }).addTo(map);
 
-    // 示例项目数据
-    const projects = [
-      { id: 1, name: "Damansara Residences", lat: 3.15, lng: 101.63 },
-      { id: 2, name: "Bukit Jalil Suites", lat: 3.05, lng: 101.68 },
-      { id: 3, name: "Setia EcoHill", lat: 2.98, lng: 101.85 }
-    ];
+      // 示例项目数据
+      const projects = [
+        { id: 1, name: "Damansara Residences", lat: 3.15, lng: 101.63 },
+        { id: 2, name: "Bukit Jalil Suites", lat: 3.05, lng: 101.68 },
+        { id: 3, name: "Setia EcoHill", lat: 2.98, lng: 101.85 }
+      ];
 
-    // 添加项目标记到地图
-    projects.forEach(p => {
-      L.marker([p.lat, p.lng])
-        .addTo(map)
-        .bindPopup(`<strong>${p.name}</strong><br><a href="#project-${p.id}">查看项目</a>`);
-    });
+      // 添加项目标记到地图
+      projects.forEach(p => {
+        L.marker([p.lat, p.lng])
+          .addTo(map)
+          .bindPopup(`<strong>${p.name}</strong><br><a href="#project-${p.id}">查看项目</a>`);
+      });
+    }
   </script>
 
 </body>
