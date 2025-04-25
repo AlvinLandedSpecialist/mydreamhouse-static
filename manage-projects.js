@@ -11,15 +11,61 @@ document.addEventListener("DOMContentLoaded", function () {
   const projectsContainer = document.getElementById("projects-container");
   const createForm = document.getElementById("create-project-form");
   const logoutBtn = document.getElementById("logout-btn");
+  const filterInput = document.getElementById("filter-input");
 
-  // 登出功能
+  let allProjects = [];
+  let currentPage = 1;
+  const itemsPerPage = 5;
+
   logoutBtn.addEventListener("click", function () {
     localStorage.removeItem("access_token");
     alert("Logged out successfully.");
     window.location.href = "login.html";
   });
 
-  // 获取所有项目
+  function displayProjects(projects) {
+    projectsContainer.innerHTML = "";
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const paginatedProjects = projects.slice(start, end);
+
+    paginatedProjects.forEach((project) => {
+      const div = document.createElement("div");
+      div.className = "project-card";
+      div.innerHTML = `
+        <h3>${project.title}</h3>
+        <p>${project.content}</p>
+        <p>Price: ${project.price}</p>
+        <p>YouTube: <a href="${project.youtube_link}" target="_blank">${project.youtube_link}</a></p>
+        <div class="image-preview">
+          ${(project.images || []).map(img => `<img src="${img}" width="100">`).join(" ")}
+        </div>
+        <button onclick="deleteProject(${project.id})">Delete</button>
+        <button onclick="editProject(${project.id}, '${project.title}', \`${project.content}\`, '${project.price}', '${project.youtube_link}')">Edit</button>
+      `;
+      projectsContainer.appendChild(div);
+    });
+
+    renderPagination(projects.length);
+  }
+
+  function renderPagination(totalItems) {
+    const pagination = document.getElementById("pagination");
+    pagination.innerHTML = "";
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+    for (let i = 1; i <= totalPages; i++) {
+      const btn = document.createElement("button");
+      btn.textContent = i;
+      btn.disabled = i === currentPage;
+      btn.addEventListener("click", () => {
+        currentPage = i;
+        displayProjects(allProjects);
+      });
+      pagination.appendChild(btn);
+    }
+  }
+
   function fetchProjects() {
     fetch(apiUrl, {
       headers: {
@@ -28,36 +74,31 @@ document.addEventListener("DOMContentLoaded", function () {
     })
       .then((res) => res.json())
       .then((projects) => {
-        projectsContainer.innerHTML = "";
-        projects.forEach((project) => {
-          const div = document.createElement("div");
-          div.className = "project-card";
-          div.innerHTML = `
-            <h3>${project.title}</h3>
-            <p>${project.content}</p>
-            <p>Price: ${project.price}</p>
-            <p>YouTube: <a href="${project.youtube_link}" target="_blank">${project.youtube_link}</a></p>
-            <button onclick="deleteProject(${project.id})">Delete</button>
-            <button onclick="editProject(${project.id}, '${project.title}', \`${project.content}\`, '${project.price}', '${project.youtube_link}')">Edit</button>
-          `;
-          projectsContainer.appendChild(div);
-        });
+        allProjects = projects;
+        displayProjects(allProjects);
       });
   }
 
-  // 创建项目
+  filterInput.addEventListener("input", function () {
+    const keyword = this.value.toLowerCase();
+    const filtered = allProjects.filter(project =>
+      project.title.toLowerCase().includes(keyword) ||
+      project.content.toLowerCase().includes(keyword)
+    );
+    currentPage = 1;
+    displayProjects(filtered);
+  });
+
   createForm.addEventListener("submit", function (e) {
     e.preventDefault();
     const formData = new FormData(createForm);
-    const projectData = Object.fromEntries(formData);
 
     fetch(apiUrl, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(projectData),
+      body: formData,
     })
       .then((res) => res.json())
       .then(() => {
@@ -66,7 +107,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   });
 
-  // 删除项目
   window.deleteProject = function (id) {
     if (confirm("Are you sure you want to delete this project?")) {
       fetch(`${apiUrl}/${id}`, {
@@ -80,7 +120,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   };
 
-  // 编辑项目
   window.editProject = function (id, title, content, price, youtube_link) {
     const newTitle = prompt("New title:", title);
     const newContent = prompt("New content:", content);
