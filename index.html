@@ -1,94 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Dream House</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        #map {
-            height: 400px;
-            width: 100%;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>地图测试</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- 移除 integrity 与 crossorigin，确保地图能加载 -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    #map {
+      height: 100vh; /* 全屏地图 */
+      width: 100vw;
+    }
+  </style>
 </head>
 <body>
-    <div class="container mt-4">
-        <h1>房地产项目展示</h1>
 
-        <!-- 地图区域 -->
-        <div id="map"></div>
+  <div id="map"></div>
 
-        <!-- 项目列表 -->
-        <h2>项目列表</h2>
-        <div id="projects" class="row">
-            <!-- 项目卡片将通过 JavaScript 动态插入 -->
-        </div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-        <!-- 登录按钮（如果需要） -->
-        <button id="loginBtn" class="btn btn-primary">登录</button>
-    </div>
+  <script>
+    const map = L.map('map').setView([3.139, 101.6869], 12);
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
 
-    <!-- 加载 Leaflet 地图 -->
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    L.marker([3.139, 101.6869]).addTo(map)
+      .bindPopup('这是吉隆坡')
+      .openPopup();
+  </script>
 
-    <script>
-        // 获取项目数据并展示
-        function fetchProjects(page = 1) {
-            $.get(`https://your-backend-api-url.com/projects?page=${page}`, function(data) {
-                const projectsContainer = $("#projects");
-                projectsContainer.empty(); // 清空现有项目
-
-                data.data.forEach(project => {
-                    // 创建项目卡片
-                    const projectCard = `
-                        <div class="col-md-4 mb-4">
-                            <div class="card">
-                                <img src="${project.imageUrl}" class="card-img-top" alt="${project.name}">
-                                <div class="card-body">
-                                    <h5 class="card-title">${project.name}</h5>
-                                    <p class="card-text">${project.description}</p>
-                                    <a href="/project/${project.id}" class="btn btn-primary">查看详情</a>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    projectsContainer.append(projectCard);
-                });
-            });
-        }
-
-        // 初始化地图
-        function initMap() {
-            const map = L.map('map').setView([0, 0], 2); // 初始视图和缩放级别
-
-            // 使用 OpenStreetMap 提供的 TileLayer
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-
-            // 假设从后端获取每个项目的坐标数据，并将其添加到地图上
-            $.get('https://your-backend-api-url.com/projects', function(data) {
-                data.data.forEach(project => {
-                    const marker = L.marker([project.latitude, project.longitude]).addTo(map);
-                    marker.bindPopup(`<b>${project.name}</b><br>${project.description}`).openPopup();
-                    
-                    // 设置点击事件，跳转到项目详情页
-                    marker.on('click', function() {
-                        window.location.href = `/project/${project.id}`;
-                    });
-                });
-            });
-        }
-
-        // 页面加载时调用
-        $(document).ready(function() {
-            fetchProjects(); // 获取并展示项目
-            initMap(); // 初始化地图
-        });
-    </script>
 </body>
 </html>
