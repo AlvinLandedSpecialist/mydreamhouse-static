@@ -32,6 +32,58 @@
       padding: 6px 12px;
       margin: 0 5px;
     }
+    /* WhatsApp Floating Button */
+    .whatsapp-float {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #25d366;
+      color: white;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      text-decoration: none;
+      z-index: 1000;
+    }
+    .calculator {
+      max-width: 400px;
+      margin: 40px auto;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
+    }
+    .calculator h2 {
+      text-align: center;
+    }
+    .calculator label {
+      display: block;
+      margin-top: 10px;
+    }
+    .calculator input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+    }
+    .calculator button {
+      margin-top: 15px;
+      width: 100%;
+      padding: 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+    .calculator .result {
+      margin-top: 15px;
+      font-weight: bold;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -46,6 +98,28 @@
     <button id="nextPage">下一页</button>
   </div>
 
+  <!-- 房贷计算器 -->
+  <div class="calculator">
+    <h2>房贷计算器</h2>
+    <label for="price">房屋总价 (RM):</label>
+    <input type="number" id="price" placeholder="如：500000">
+
+    <label for="rate">年利率 (%):</label>
+    <input type="number" id="rate" step="0.01" placeholder="如：4.5">
+
+    <label for="years">贷款年限:</label>
+    <input type="number" id="years" placeholder="如：30">
+
+    <button onclick="calculateLoan()">计算每月还款</button>
+
+    <div class="result" id="loanResult"></div>
+  </div>
+
+  <!-- WhatsApp 按钮 -->
+  <a href="https://wa.me/60169583621?text=我对您的房产项目感兴趣" target="_blank" class="whatsapp-float">
+    💬
+  </a>
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     const projects = [
@@ -55,7 +129,6 @@
       { id: 'project-d', title: 'Bangi 项目', desc: '大学城附近优选', img: 'https://via.placeholder.com/300x200', lat: 2.9365, lng: 101.7574, page: 1 },
       { id: 'project-e', title: 'Semenyih 项目', desc: '未来发展潜力大', img: 'https://via.placeholder.com/300x200', lat: 2.9516, lng: 101.8450, page: 1 },
       { id: 'project-f', title: 'Puchong 项目', desc: '成熟住宅区', img: 'https://via.placeholder.com/300x200', lat: 3.0260, lng: 101.6199, page: 1 },
-
       { id: 'project-g', title: 'Klang 项目', desc: '巴生市区公寓', img: 'https://via.placeholder.com/300x200', lat: 3.0433, lng: 101.4500, page: 2 },
       { id: 'project-h', title: 'Shah Alam 项目', desc: '州政府行政中心旁', img: 'https://via.placeholder.com/300x200', lat: 3.0738, lng: 101.5183, page: 2 },
       { id: 'project-i', title: 'Rawang 项目', desc: '北部花园住宅', img: 'https://via.placeholder.com/300x200', lat: 3.3215, lng: 101.5767, page: 2 },
@@ -125,6 +198,21 @@
         renderProjects();
       }
     });
+
+    function calculateLoan() {
+      const price = parseFloat(document.getElementById('price').value);
+      const rate = parseFloat(document.getElementById('rate').value) / 100 / 12;
+      const years = parseInt(document.getElementById('years').value);
+      const months = years * 12;
+
+      if (isNaN(price) || isNaN(rate) || isNaN(years)) {
+        document.getElementById('loanResult').textContent = '请输入有效数值';
+        return;
+      }
+
+      const monthly = (price * rate) / (1 - Math.pow(1 + rate, -months));
+      document.getElementById('loanResult').textContent = `每月还款约为：RM ${monthly.toFixed(2)}`;
+    }
 
     renderProjects();
     renderMap();
