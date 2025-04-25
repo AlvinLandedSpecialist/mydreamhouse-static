@@ -1,86 +1,105 @@
-// manage-projects.js
-
 document.addEventListener("DOMContentLoaded", function () {
   const token = localStorage.getItem("access_token");
+  const apiUrl = "https://mydreamhouse-backend.onrender.com/projects";
+
   if (!token) {
     alert("Please login first.");
     window.location.href = "login.html";
     return;
   }
 
-  const headers = {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-  };
+  const projectsContainer = document.getElementById("projects-container");
+  const createForm = document.getElementById("create-project-form");
 
-  function loadProjects() {
-    axios
-      .get("https://mydreamhouse-backend.onrender.com/projects", { headers })
-      .then((response) => {
-        const projects = response.data;
-        const container = document.getElementById("projects-list");
-        container.innerHTML = "";
-
+  // 获取所有项目
+  function fetchProjects() {
+    fetch(apiUrl, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((projects) => {
+        projectsContainer.innerHTML = "";
         projects.forEach((project) => {
           const div = document.createElement("div");
-          div.className = "card mb-3";
+          div.className = "project-card";
           div.innerHTML = `
-            <div class="card-body">
-              <h5 class="card-title">${project.title}</h5>
-              <p class="card-text">${project.content}</p>
-              <p class="card-text"><strong>Price:</strong> ${project.price}</p>
-              <p class="card-text"><a href="${project.youtube_link}" target="_blank">YouTube Video</a></p>
-              <button class="btn btn-danger btn-sm" onclick="deleteProject(${project.id})">Delete</button>
-            </div>
+            <h3>${project.title}</h3>
+            <p>${project.content}</p>
+            <p>Price: ${project.price}</p>
+            <p>YouTube: <a href="${project.youtube_link}" target="_blank">${project.youtube_link}</a></p>
+            <button onclick="deleteProject(${project.id})">Delete</button>
+            <button onclick="editProject(${project.id}, '${project.title}', \`${project.content}\`, '${project.price}', '${project.youtube_link}')">Edit</button>
           `;
-          container.appendChild(div);
+          projectsContainer.appendChild(div);
         });
-      })
-      .catch((error) => {
-        console.error("Error loading projects:", error);
-        alert("Failed to load projects.");
       });
   }
 
-  window.deleteProject = function (id) {
-    if (confirm("Are you sure to delete this project?")) {
-      axios
-        .delete(`https://mydreamhouse-backend.onrender.com/projects/${id}`, { headers })
-        .then(() => {
-          alert("Project deleted.");
-          loadProjects();
-        })
-        .catch((error) => {
-          console.error("Error deleting project:", error);
-          alert("Failed to delete.");
-        });
-    }
-  };
-
-  document.getElementById("project-form").addEventListener("submit", function (e) {
+  // 创建项目
+  createForm.addEventListener("submit", function (e) {
     e.preventDefault();
+    const formData = new FormData(createForm);
+    const projectData = Object.fromEntries(formData);
 
-    const title = document.getElementById("title").value;
-    const price = document.getElementById("price").value;
-    const youtube_link = document.getElementById("youtube_link").value;
-    const content = document.getElementById("content").value;
-
-    axios
-      .post(
-        "https://mydreamhouse-backend.onrender.com/projects",
-        { title, price, youtube_link, content },
-        { headers }
-      )
+    fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(projectData),
+    })
+      .then((res) => res.json())
       .then(() => {
-        alert("Project created successfully.");
-        document.getElementById("project-form").reset();
-        loadProjects();
-      })
-      .catch((error) => {
-        console.error("Error creating project:", error);
-        alert("Failed to create project.");
+        createForm.reset();
+        fetchProjects();
       });
   });
 
-  loadProjects();
+  // 删除项目
+  window.deleteProject = function (id) {
+    if (confirm("Are you sure you want to delete this project?")) {
+      fetch(`${apiUrl}/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((res) => res.json())
+        .then(() => fetchProjects());
+    }
+  };
+
+  // 编辑项目
+  window.editProject = function (id, title, content, price, youtube_link) {
+    const newTitle = prompt("New title:", title);
+    const newContent = prompt("New content:", content);
+    const newPrice = prompt("New price:", price);
+    const newYoutube = prompt("New YouTube link:", youtube_link);
+
+    if (!newTitle || !newContent || !newPrice) {
+      alert("All fields must be filled.");
+      return;
+    }
+
+    fetch(`${apiUrl}/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        title: newTitle,
+        content: newContent,
+        price: newPrice,
+        youtube_link: newYoutube,
+      }),
+    })
+      .then((res) => res.json())
+      .then(() => fetchProjects());
+  };
+
+  fetchProjects();
 });
