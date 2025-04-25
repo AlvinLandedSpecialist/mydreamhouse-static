@@ -10,6 +10,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const projectsContainer = document.getElementById("projects-container");
   const createForm = document.getElementById("create-project-form");
+  const logoutBtn = document.getElementById("logout-btn");
+
+  // 登出功能
+  logoutBtn.addEventListener("click", function () {
+    localStorage.removeItem("access_token");
+    alert("Logged out successfully.");
+    window.location.href = "login.html";
+  });
 
   // 获取所有项目
   function fetchProjects() {
