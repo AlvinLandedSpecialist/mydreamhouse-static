@@ -13,7 +13,13 @@
         <button type="submit">Login</button>
     </form>
     
+    <!-- axios -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <!-- 如果你已经创建 login.js 文件，可以使用这一行连接外部脚本 -->
+    <script src="login.js"></script>
+
+    <!-- 如果你要保留内联 JS 作为 fallback 或测试用，也可以保留 -->
     <script>
         document.getElementById('login-form').addEventListener('submit', function(event) {
             event.preventDefault();
