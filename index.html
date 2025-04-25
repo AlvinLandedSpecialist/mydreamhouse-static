@@ -221,23 +221,23 @@
     let currentPage = 1;
     const projectsPerPage = 6;
 
-    function renderProjects() {
-      const container = document.getElementById('projects');
-      container.innerHTML = '';
-      const pageProjects = projects.filter(p => p.page === currentPage);
-      pageProjects.forEach(project => {
-        const card = document.createElement('div');
-        card.className = 'project-card';
-        card.id = project.id;
-        card.innerHTML = `
-          <img src="${project.img}" alt="${project.title}" style="width:100%; border-radius: 5px;">
-          <h3>${project.title}</h3>
-          <p>${project.desc}</p>
-        `;
-        container.appendChild(card);
-      });
-      document.getElementById('pageNum').textContent = `Page ${currentPage}`;
-    }
+   function renderProjects() {
+  const container = document.getElementById('projects');
+  container.innerHTML = '';
+  const pageProjects = projects.filter(p => p.page === currentPage);
+  pageProjects.forEach(project => {
+    const card = document.createElement('div');
+    card.className = 'project-card';
+    card.id = project.id;
+    card.innerHTML = `
+      <img src="${project.img}" alt="${project.title}" style="width:100%; border-radius: 5px;">
+      <h3>${project.title}</h3>
+      <p>${project.desc}</p>
+    `;
+    container.appendChild(card);
+  });
+  document.getElementById('pageNum').textContent = `Page ${currentPage}`;
+}
 
     function renderMap() {
       const map = L.map('map').setView([3.0, 101.6], 10);
