@@ -1,44 +1,133 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>地图测试</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- 移除 integrity 与 crossorigin，确保地图能加载 -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>我的房地产网页</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-    }
-
     #map {
-      height: 100vh; /* 全屏地图 */
-      width: 100vw;
+      height: 400px;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    .project-card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 10px;
+      width: 300px;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+    }
+    .project-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .pagination {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .pagination button {
+      padding: 6px 12px;
+      margin: 0 5px;
     }
   </style>
 </head>
 <body>
 
+  <h1 style="text-align:center;">我的房产项目</h1>
+
   <div id="map"></div>
+  <div class="project-container" id="projects"></div>
+  <div class="pagination">
+    <button id="prevPage">上一页</button>
+    <span id="pageNum">第 1 页</span>
+    <button id="nextPage">下一页</button>
+  </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
   <script>
-    const map = L.map('map').setView([3.139, 101.6869], 12);
+    const projects = [
+      { id: 'project-a', title: 'Cyberjaya 项目', desc: '科技城中心住宅', img: 'https://via.placeholder.com/300x200', lat: 2.9264, lng: 101.6400, page: 1 },
+      { id: 'project-b', title: 'Banting 项目', desc: '郊区别墅计划', img: 'https://via.placeholder.com/300x200', lat: 2.8130, lng: 101.5021, page: 1 },
+      { id: 'project-c', title: 'Kajang 项目', desc: '地铁沿线好房', img: 'https://via.placeholder.com/300x200', lat: 2.9945, lng: 101.7890, page: 1 },
+      { id: 'project-d', title: 'Bangi 项目', desc: '大学城附近优选', img: 'https://via.placeholder.com/300x200', lat: 2.9365, lng: 101.7574, page: 1 },
+      { id: 'project-e', title: 'Semenyih 项目', desc: '未来发展潜力大', img: 'https://via.placeholder.com/300x200', lat: 2.9516, lng: 101.8450, page: 1 },
+      { id: 'project-f', title: 'Puchong 项目', desc: '成熟住宅区', img: 'https://via.placeholder.com/300x200', lat: 3.0260, lng: 101.6199, page: 1 },
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+      { id: 'project-g', title: 'Klang 项目', desc: '巴生市区公寓', img: 'https://via.placeholder.com/300x200', lat: 3.0433, lng: 101.4500, page: 2 },
+      { id: 'project-h', title: 'Shah Alam 项目', desc: '州政府行政中心旁', img: 'https://via.placeholder.com/300x200', lat: 3.0738, lng: 101.5183, page: 2 },
+      { id: 'project-i', title: 'Rawang 项目', desc: '北部花园住宅', img: 'https://via.placeholder.com/300x200', lat: 3.3215, lng: 101.5767, page: 2 },
+      { id: 'project-j', title: 'Sungai Buloh 项目', desc: '靠近捷运及医院', img: 'https://via.placeholder.com/300x200', lat: 3.1976, lng: 101.5822, page: 2 },
+    ];
 
-    L.marker([3.139, 101.6869]).addTo(map)
-      .bindPopup('这是吉隆坡')
-      .openPopup();
+    let currentPage = 1;
+    const projectsPerPage = 6;
+
+    function renderProjects() {
+      const container = document.getElementById('projects');
+      container.innerHTML = '';
+      const pageProjects = projects.filter(p => p.page === currentPage);
+      pageProjects.forEach(project => {
+        const card = document.createElement('div');
+        card.className = 'project-card';
+        card.id = project.id;
+        card.innerHTML = `
+          <img src="${project.img}" alt="${project.title}" style="width:100%; border-radius: 5px;">
+          <h3>${project.title}</h3>
+          <p>${project.desc}</p>
+        `;
+        container.appendChild(card);
+      });
+      document.getElementById('pageNum').textContent = `第 ${currentPage} 页`;
+    }
+
+    function renderMap() {
+      const map = L.map('map').setView([3.0, 101.6], 10);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+      }).addTo(map);
+
+      projects.forEach(project => {
+        const marker = L.marker([project.lat, project.lng]).addTo(map);
+        marker.bindPopup(`<b>${project.title}</b><br>${project.desc}`);
+        marker.on('click', () => {
+          if (currentPage !== project.page) {
+            currentPage = project.page;
+            renderProjects();
+            setTimeout(() => scrollToProject(project.id), 300);
+          } else {
+            scrollToProject(project.id);
+          }
+        });
+      });
+    }
+
+    function scrollToProject(projectId) {
+      const element = document.getElementById(projectId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    document.getElementById('prevPage').addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderProjects();
+      }
+    });
+
+    document.getElementById('nextPage').addEventListener('click', () => {
+      const maxPage = Math.ceil(projects.length / projectsPerPage);
+      if (currentPage < maxPage) {
+        currentPage++;
+        renderProjects();
+      }
+    });
+
+    renderProjects();
+    renderMap();
   </script>
 
 </body>
