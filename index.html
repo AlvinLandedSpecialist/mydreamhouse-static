@@ -213,7 +213,7 @@
       }
 
       const monthly = (price * rate) / (1 - Math.pow(1 + rate, -months));
-      document.getElementById('loanResult').textContent = `每月还款约为：RM ${monthly.toFixed(2)}`;
+      document.getElementById('loanResult').textContent = `monthly payment：RM ${monthly.toFixed(2)}`;
     }
 
     renderProjects();
