@@ -66,7 +66,7 @@
     let projects = [], map, currentPage = 1, perPage = 6;
 
     async function loadProjects() {
-      const res = await fetch('https://mydreamhouse-backend.onrender.com/api/projects');
+      const res = await fetch('https://your-backend-service.onrender.com/api/projects?lang=zh');
       projects = await res.json();
       populateFilters(); renderProjects(); renderMap();
     }
