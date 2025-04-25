@@ -84,125 +84,9 @@
       font-weight: bold;
       text-align: center;
     }
-    
-    /* 后台登录样式 */
-    .admin-login {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      z-index: 1000;
-    }
-    .admin-login button {
-      padding: 8px 15px;
-      background-color: #333;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 2000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.7);
-    }
-    .modal-content {
-      background-color: #fefefe;
-      margin: 15% auto;
-      padding: 20px;
-      border: 1px solid #888;
-      width: 80%;
-      max-width: 400px;
-      border-radius: 8px;
-    }
-    .close {
-      color: #aaa;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .close:hover {
-      color: black;
-    }
-    .admin-form input {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      box-sizing: border-box;
-    }
-    .admin-form button {
-      width: 100%;
-      padding: 10px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    
-    /* 后台管理面板 */
-    #adminPanel {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: white;
-      z-index: 3000;
-      padding: 20px;
-      overflow-y: auto;
-    }
-    .admin-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    .admin-section {
-      margin-bottom: 30px;
-      padding: 15px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-    }
-    .project-form input, .project-form textarea {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-    }
-    .project-form button {
-      padding: 8px 15px;
-      background-color: #2196F3;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .video-container {
-      position: relative;
-      padding-bottom: 56.25%;
-      height: 0;
-      overflow: hidden;
-      margin-top: 15px;
-    }
-    .video-container iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
   </style>
 </head>
 <body>
-
-  <div class="admin-login">
-    <button onclick="openLoginModal()">后台登录</button>
-  </div>
 
   <h1 style="text-align:center;">我的房产项目</h1>
 
@@ -216,157 +100,68 @@
 
   <!-- 房贷计算器 -->
   <div class="calculator">
-    <h2>Mortgage Calculator</h2>
-    <label for="price">Property Price (RM):</label>
+    <h2>房贷计算器</h2>
+    <label for="price">房屋总价 (RM):</label>
     <input type="number" id="price" placeholder="如：500000">
 
-    <label for="rate">Interest Rate (%):</label>
+    <label for="rate">年利率 (%):</label>
     <input type="number" id="rate" step="0.01" placeholder="如：4.5">
 
-    <label for="years">Loan Term (years):</label>
+    <label for="years">贷款年限:</label>
     <input type="number" id="years" placeholder="如：30">
 
-    <button onclick="calculateLoan()">Calculate Monthly Payment</button>
+    <button onclick="calculateLoan()">计算每月还款</button>
 
     <div class="result" id="loanResult"></div>
   </div>
 
   <!-- WhatsApp 按钮 -->
-  <a href="https://wa.me/60169583621?text=我对您的房产项目感兴趣 , I'm interested ur Property " target="_blank" class="whatsapp-float">
+  <a href="https://wa.me/60169583621?text=我对您的房产项目感兴趣" target="_blank" class="whatsapp-float">
     💬
   </a>
 
-  <!-- 登录模态框 -->
-  <div id="loginModal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal('loginModal')">&times;</span>
-      <h2>管理员登录</h2>
-      <form class="admin-form" onsubmit="login(event)">
-        <input type="text" id="username" placeholder="用户名" required>
-        <input type="password" id="password" placeholder="密码" required>
-        <button type="submit">登录</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- 后台管理面板 -->
-  <div id="adminPanel">
-    <div class="admin-header">
-      <h2>后台管理系统</h2>
-      <button onclick="logout()">退出登录</button>
-    </div>
-    
-    <div class="admin-section">
-      <h3>添加新项目</h3>
-      <form class="project-form" onsubmit="addProject(event)">
-        <input type="text" id="projectId" placeholder="项目ID (如: project-k)" required>
-        <input type="text" id="projectTitle" placeholder="项目标题" required>
-        <textarea id="projectDesc" placeholder="项目描述" required></textarea>
-        <input type="text" id="projectImg" placeholder="图片URL" required>
-        <input type="text" id="projectYoutube" placeholder="YouTube视频ID (如: dQw4w9WgXcQ)">
-        <input type="number" step="0.000001" id="projectLat" placeholder="纬度 (如: 3.1390)" required>
-        <input type="number" step="0.000001" id="projectLng" placeholder="经度 (如: 101.6869)" required>
-        <input type="number" id="projectPage" placeholder="页码 (1或2)" min="1" max="2" required>
-        <button type="submit">添加项目</button>
-      </form>
-    </div>
-    
-    <div class="admin-section">
-      <h3>现有项目</h3>
-      <div id="projectList"></div>
-    </div>
-  </div>
-
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    // 项目数据
-    let projects = [
-      { id: 'project-a', title: 'Cyberjaya 项目', desc: '科技城中心住宅', img: 'https://via.placeholder.com/300x200', youtube: '', lat: 2.9264, lng: 101.6400, page: 1 },
-      { id: 'project-b', title: 'Banting 项目', desc: '郊区别墅计划', img: 'https://via.placeholder.com/300x200', youtube: '', lat: 2.8130, lng: 101.5021, page: 1 },
-      { id: 'project-c', title: 'Kajang 项目', desc: '地铁沿线好房', img: 'https://via.placeholder.com/300x200', youtube: '', lat: 2.9945, lng: 101.7890, page: 1 },
-      { id: 'project-d', title: 'Bangi 项目', desc: '大学城附近优选', img: 'https://via.placeholder.com/300x200', youtube: '', lat: 2.9365, lng: 101.7574, page: 1 },
-      { id: 'project-e', title: 'Semenyih 项目', desc: '未来发展潜力大', img: 'https://via.placeholder.com/300x200', youtube: '', lat: 2.9516, lng: 101.8450, page: 1 },
-      { id: 'project-f', title: 'Puchong 项目', desc: '成熟住宅区', img: 'https://via.placeholder.com/300x200', youtube: '', lat: 3.0260, lng: 101.6199, page: 1 },
-      { id: 'project-g', title: 'Klang 项目', desc: '巴生市区公寓', img: 'https://via.placeholder.com/300x200', youtube: '', lat: 3.0433, lng: 101.4500, page: 2 },
-      { id: 'project-h', title: 'Shah Alam 项目', desc: '州政府行政中心旁', img: 'https://via.placeholder.com/300x200', youtube: '', lat: 3.0738, lng: 101.5183, page: 2 },
-      { id: 'project-i', title: 'Rawang 项目', desc: '北部花园住宅', img: 'https://via.placeholder.com/300x200', youtube: '', lat: 3.3215, lng: 101.5767, page: 2 },
-      { id: 'project-j', title: 'Sungai Buloh 项目', desc: '靠近捷运及医院', img: 'https://via.placeholder.com/300x200', youtube: '', lat: 3.1976, lng: 101.5822, page: 2 },
+    const projects = [
+      { id: 'project-a', title: 'Cyberjaya 项目', desc: '科技城中心住宅', img: 'https://via.placeholder.com/300x200', lat: 2.9264, lng: 101.6400, page: 1 },
+      { id: 'project-b', title: 'Banting 项目', desc: '郊区别墅计划', img: 'https://via.placeholder.com/300x200', lat: 2.8130, lng: 101.5021, page: 1 },
+      { id: 'project-c', title: 'Kajang 项目', desc: '地铁沿线好房', img: 'https://via.placeholder.com/300x200', lat: 2.9945, lng: 101.7890, page: 1 },
+      { id: 'project-d', title: 'Bangi 项目', desc: '大学城附近优选', img: 'https://via.placeholder.com/300x200', lat: 2.9365, lng: 101.7574, page: 1 },
+      { id: 'project-e', title: 'Semenyih 项目', desc: '未来发展潜力大', img: 'https://via.placeholder.com/300x200', lat: 2.9516, lng: 101.8450, page: 1 },
+      { id: 'project-f', title: 'Puchong 项目', desc: '成熟住宅区', img: 'https://via.placeholder.com/300x200', lat: 3.0260, lng: 101.6199, page: 1 },
+      { id: 'project-g', title: 'Klang 项目', desc: '巴生市区公寓', img: 'https://via.placeholder.com/300x200', lat: 3.0433, lng: 101.4500, page: 2 },
+      { id: 'project-h', title: 'Shah Alam 项目', desc: '州政府行政中心旁', img: 'https://via.placeholder.com/300x200', lat: 3.0738, lng: 101.5183, page: 2 },
+      { id: 'project-i', title: 'Rawang 项目', desc: '北部花园住宅', img: 'https://via.placeholder.com/300x200', lat: 3.3215, lng: 101.5767, page: 2 },
+      { id: 'project-j', title: 'Sungai Buloh 项目', desc: '靠近捷运及医院', img: 'https://via.placeholder.com/300x200', lat: 3.1976, lng: 101.5822, page: 2 },
     ];
 
-    // 页面状态
     let currentPage = 1;
     const projectsPerPage = 6;
-    let map;
-    let markers = [];
-    let isAdmin = false;
 
-    // 初始化页面
-    document.addEventListener('DOMContentLoaded', function() {
-      renderProjects();
-      renderMap();
-      checkLoginStatus();
-      
-      // 从本地存储加载项目
-      const savedProjects = localStorage.getItem('realEstateProjects');
-      if (savedProjects) {
-        projects = JSON.parse(savedProjects);
-        renderProjects();
-        updateMapMarkers();
-      }
-    });
-
-    // 渲染项目列表
     function renderProjects() {
       const container = document.getElementById('projects');
       container.innerHTML = '';
       const pageProjects = projects.filter(p => p.page === currentPage);
-      
       pageProjects.forEach(project => {
         const card = document.createElement('div');
         card.className = 'project-card';
         card.id = project.id;
-        
-        let videoHTML = '';
-        if (project.youtube) {
-          videoHTML = `
-            <div class="video-container">
-              <iframe src="https://www.youtube.com/embed/${project.youtube}" 
-                      frameborder="0" 
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                      allowfullscreen></iframe>
-            </div>
-          `;
-        }
-        
         card.innerHTML = `
           <img src="${project.img}" alt="${project.title}" style="width:100%; border-radius: 5px;">
           <h3>${project.title}</h3>
           <p>${project.desc}</p>
-          ${videoHTML}
         `;
         container.appendChild(card);
       });
-      
       document.getElementById('pageNum').textContent = `第 ${currentPage} 页`;
     }
 
-    // 渲染地图
     function renderMap() {
-      map = L.map('map').setView([3.0, 101.6], 10);
+      const map = L.map('map').setView([3.0, 101.6], 10);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap'
       }).addTo(map);
 
-      updateMapMarkers();
-    }
-
-    // 更新地图标记
-    function updateMapMarkers() {
-      // 清除现有标记
-      markers.forEach(marker => map.removeLayer(marker));
-      markers = [];
-      
-      // 添加新标记
       projects.forEach(project => {
         const marker = L.marker([project.lat, project.lng]).addTo(map);
         marker.bindPopup(`<b>${project.title}</b><br>${project.desc}`);
@@ -379,11 +174,9 @@
             scrollToProject(project.id);
           }
         });
-        markers.push(marker);
       });
     }
 
-    // 滚动到特定项目
     function scrollToProject(projectId) {
       const element = document.getElementById(projectId);
       if (element) {
@@ -391,7 +184,6 @@
       }
     }
 
-    // 分页控制
     document.getElementById('prevPage').addEventListener('click', () => {
       if (currentPage > 1) {
         currentPage--;
@@ -400,14 +192,13 @@
     });
 
     document.getElementById('nextPage').addEventListener('click', () => {
-      const maxPage = Math.max(...projects.map(p => p.page));
+      const maxPage = Math.ceil(projects.length / projectsPerPage);
       if (currentPage < maxPage) {
         currentPage++;
         renderProjects();
       }
     });
 
-    // 房贷计算器
     function calculateLoan() {
       const price = parseFloat(document.getElementById('price').value);
       const rate = parseFloat(document.getElementById('rate').value) / 100 / 12;
@@ -423,129 +214,9 @@
       document.getElementById('loanResult').textContent = `每月还款约为：RM ${monthly.toFixed(2)}`;
     }
 
-    // 后台登录功能
-    function openLoginModal() {
-      document.getElementById('loginModal').style.display = 'block';
-    }
-
-    function closeModal(modalId) {
-      document.getElementById(modalId).style.display = 'none';
-    }
-
-    function login(event) {
-      event.preventDefault();
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-      
-      // 简单验证 - 实际应用中应该使用更安全的方式
-      if (username === 'admin' && password === 'ewpm5r2sk5') {
-        isAdmin = true;
-        localStorage.setItem('isAdmin', 'true');
-        document.getElementById('adminPanel').style.display = 'block';
-        closeModal('loginModal');
-        renderProjectList();
-      } else {
-        alert('用户名或密码错误');
-      }
-    }
-
-    function logout() {
-      isAdmin = false;
-      localStorage.removeItem('isAdmin');
-      document.getElementById('adminPanel').style.display = 'none';
-    }
-
-    function checkLoginStatus() {
-      if (localStorage.getItem('isAdmin') === 'true') {
-        isAdmin = true;
-        document.getElementById('adminPanel').style.display = 'block';
-        renderProjectList();
-      }
-    }
-
-    // 后台管理功能
-    function addProject(event) {
-      event.preventDefault();
-      
-      const newProject = {
-        id: document.getElementById('projectId').value,
-        title: document.getElementById('projectTitle').value,
-        desc: document.getElementById('projectDesc').value,
-        img: document.getElementById('projectImg').value,
-        youtube: document.getElementById('projectYoutube').value,
-        lat: parseFloat(document.getElementById('projectLat').value),
-        lng: parseFloat(document.getElementById('projectLng').value),
-        page: parseInt(document.getElementById('projectPage').value)
-      };
-      
-      projects.push(newProject);
-      saveProjects();
-      renderProjectList();
-      renderProjects();
-      updateMapMarkers();
-      
-      // 清空表单
-      event.target.reset();
-    }
-
-    function renderProjectList() {
-      const container = document.getElementById('projectList');
-      container.innerHTML = '';
-      
-      projects.forEach((project, index) => {
-        const projectDiv = document.createElement('div');
-        projectDiv.className = 'project-card';
-        projectDiv.style.margin = '10px 0';
-        projectDiv.style.padding = '10px';
-        projectDiv.style.backgroundColor = '#f5f5f5';
-        
-        projectDiv.innerHTML = `
-          <h4>${project.title} (${project.id})</h4>
-          <p>${project.desc}</p>
-          <p>页码: ${project.page} | 位置: ${project.lat}, ${project.lng}</p>
-          ${project.youtube ? `<p>YouTube ID: ${project.youtube}</p>` : ''}
-          <button onclick="editProject(${index})">编辑</button>
-          <button onclick="deleteProject(${index})">删除</button>
-        `;
-        
-        container.appendChild(projectDiv);
-      });
-    }
-
-    function editProject(index) {
-      const project = projects[index];
-      if (confirm(`确定要编辑 ${project.title} 吗?`)) {
-        document.getElementById('projectId').value = project.id;
-        document.getElementById('projectTitle').value = project.title;
-        document.getElementById('projectDesc').value = project.desc;
-        document.getElementById('projectImg').value = project.img;
-        document.getElementById('projectYoutube').value = project.youtube;
-        document.getElementById('projectLat').value = project.lat;
-        document.getElementById('projectLng').value = project.lng;
-        document.getElementById('projectPage').value = project.page;
-        
-        // 删除旧项目
-        projects.splice(index, 1);
-        saveProjects();
-        renderProjectList();
-        renderProjects();
-        updateMapMarkers();
-      }
-    }
-
-    function deleteProject(index) {
-      if (confirm(`确定要删除 ${projects[index].title} 吗?`)) {
-        projects.splice(index, 1);
-        saveProjects();
-        renderProjectList();
-        renderProjects();
-        updateMapMarkers();
-      }
-    }
-
-    function saveProjects() {
-      localStorage.setItem('realEstateProjects', JSON.stringify(projects));
-    }
+    renderProjects();
+    renderMap();
   </script>
+
 </body>
 </html>
