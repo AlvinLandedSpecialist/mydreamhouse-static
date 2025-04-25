@@ -1,58 +1,38 @@
+<!-- projects.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Project</title>
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects</title>
 </head>
 <body>
-  <h2>Create Project</h2>
-  <form id="projectForm">
-    <div>
-      <label for="title">Project Title:</label>
-      <input type="text" id="title" required>
-    </div>
-    <div>
-      <label for="content">Project Content:</label>
-      <textarea id="content" required></textarea>
-    </div>
-    <button type="submit">Create Project</button>
-  </form>
+    <h2>Your Projects</h2>
+    <div id="projects-list"></div>
 
-  <div id="message"></div>
-
-  <script>
-    const projectForm = document.getElementById('projectForm');
-    const messageDiv = document.getElementById('message');
-
-    projectForm.addEventListener('submit', function(event) {
-      event.preventDefault();
-
-      const token = localStorage.getItem('access_token');
-      if (!token) {
-        messageDiv.innerHTML = 'You must be logged in to create a project.';
-        return;
-      }
-
-      const title = document.getElementById('title').value;
-      const content = document.getElementById('content').value;
-
-      axios.post('https://mydreamhouse-backend.onrender.com/projects', {
-        title: title,
-        content: content
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`
+    <script>
+        const token = localStorage.getItem('token');
+        if (token) {
+            axios.get('https://mydreamhouse-backend.onrender.com/projects', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                const projects = response.data;
+                const projectsList = document.getElementById('projects-list');
+                projects.forEach(project => {
+                    const projectDiv = document.createElement('div');
+                    projectDiv.textContent = `${project.title}: ${project.content}`;
+                    projectsList.appendChild(projectDiv);
+                });
+            })
+            .catch(error => {
+                alert('Failed to load projects. Please try again.');
+            });
+        } else {
+            alert('You are not logged in!');
         }
-      })
-      .then(response => {
-        messageDiv.innerHTML = 'Project created successfully!';
-      })
-      .catch(error => {
-        messageDiv.innerHTML = 'Failed to create project.';
-      });
-    });
-  </script>
+    </script>
 </body>
 </html>
