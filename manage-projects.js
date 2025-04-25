@@ -16,7 +16,55 @@ document.addEventListener("DOMContentLoaded", function () {
     const imagePreview = document.getElementById("image-preview");
 
     let currentPage = 1;
-    const projectsPerPage = 5;
+const itemsPerPage = 6;
+
+function fetchProjects(page = 1) {
+  fetch(apiUrl, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((res) => res.json())
+    .then((projects) => {
+      const totalPages = Math.ceil(projects.length / itemsPerPage);
+      const paginatedProjects = projects.slice(
+        (page - 1) * itemsPerPage,
+        page * itemsPerPage
+      );
+
+      projectsContainer.innerHTML = "";
+
+      paginatedProjects.forEach((project) => {
+        const div = document.createElement("div");
+        div.className = "project-card";
+        div.innerHTML = `
+          <h3>${project.title}</h3>
+          <p>${project.content}</p>
+          <p>Price: ${project.price}</p>
+          <p>YouTube: <a href="${project.youtube_link}" target="_blank">${project.youtube_link}</a></p>
+          <button onclick="deleteProject(${project.id})">Delete</button>
+          <button onclick="editProject(${project.id}, '${project.title}', \`${project.content}\`, '${project.price}', '${project.youtube_link}')">Edit</button>
+        `;
+        projectsContainer.appendChild(div);
+      });
+
+      renderPaginationControls(totalPages);
+    });
+}
+
+function renderPaginationControls(totalPages) {
+  const paginationContainer = document.getElementById("pagination-controls");
+  paginationContainer.innerHTML = `
+    <button ${currentPage === 1 ? "disabled" : ""} onclick="changePage(${currentPage - 1})">上一页</button>
+    <span> 第 ${currentPage} 页 / 共 ${totalPages} 页 </span>
+    <button ${currentPage === totalPages ? "disabled" : ""} onclick="changePage(${currentPage + 1})">下一页</button>
+  `;
+}
+
+window.changePage = function (newPage) {
+  currentPage = newPage;
+  fetchProjects(currentPage);
+};
 
     // 登出功能
     logoutBtn.addEventListener("click", function () {
