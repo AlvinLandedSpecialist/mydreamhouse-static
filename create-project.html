@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>创建新项目</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>创建新项目</h2>
+  <form id="projectForm">
+    <label>标题:</label><br/>
+    <input type="text" id="title" required><br/><br/>
+
+    <label>内容:</label><br/>
+    <textarea id="content" required></textarea><br/><br/>
+
+    <label>价格:</label><br/>
+    <input type="number" id="price" required><br/><br/>
+
+    <label>YouTube 视频链接:</label><br/>
+    <input type="url" id="youtube_link"><br/><br/>
+
+    <button type="submit">提交项目</button>
+  </form>
+
+  <p id="message"></p>
+  <button onclick="logout()">登出</button>
+
+  <script src="create-project.js"></script>
+</body>
+</html>
