@@ -1,16 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Dream House</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
     #map { height: 400px; width: 100%; }
     .filter { display: flex; justify-content: center; gap: 10px; margin: 10px; }
     .filter select { padding: 8px; border-radius: 6px; }
@@ -30,8 +26,8 @@
 <body>
   <div class="lang-switch">
     <select id="langSelect" onchange="switchLang()">
-      <option value="en">English</option>
       <option value="zh">中文</option>
+      <option value="en">English</option>
     </select>
   </div>
   <div id="map"></div>
@@ -54,45 +50,104 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    let projects = [];
+    const translations = {
+      "Cyberjaya Project": { zh: "赛城项目", en: "Cyberjaya Project" },
+      "Banting Project": { zh: "万津项目", en: "Banting Project" },
+      "Kajang Project": { zh: "加影项目", en: "Kajang Project" },
+      "Bangi Project": { zh: "万宜项目", en: "Bangi Project" },
+      "Semenyih Project": { zh: "士毛月项目", en: "Semenyih Project" },
+      "Puchong Project": { zh: "蒲种项目", en: "Puchong Project" },
+      "Klang Project": { zh: "巴生项目", en: "Klang Project" },
+      "Shah Alam Project": { zh: "莎阿南项目", en: "Shah Alam Project" },
+      "Rawang Project": { zh: "拉旺项目", en: "Rawang Project" },
+      "Sungai Buloh Project": { zh: "双溪毛糯项目", en: "Sungai Buloh Project" }
+    };
+
+    let projects = [], map, currentPage = 1, perPage = 6;
+
     async function loadProjects() {
       const res = await fetch('https://mydreamhouse-backend.onrender.com/api/projects');
       projects = await res.json();
       populateFilters(); renderProjects(); renderMap();
     }
+
     function populateFilters() {
-      const areas = [...new Set(projects.map(p=>p.area))];
+      const areas = [...new Set(projects.map(p => p.area))];
       const areaFilter = document.getElementById('areaFilter');
-      areas.forEach(a=>{ let o=new Option(a,a); areaFilter.add(o); });
+      areaFilter.innerHTML = `<option value="all">${langSelect.value === 'zh' ? '全部地区' : 'All Areas'}</option>`;
+      areas.forEach(a => {
+        const option = new Option(a, a);
+        areaFilter.add(option);
+      });
     }
-    let map;
+
     function renderMap() {
-      if (!map) map = L.map('map').setView([3.05,101.7],10);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ attribution:'© OSM' }).addTo(map);
-      projects.forEach(p=>{ L.marker([p.lat,p.lng]).addTo(map).on('click',()=>{ window.location.href=p.link; }); });
+      map = L.map('map').setView([3.05, 101.7], 10);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OSM' }).addTo(map);
+      const lang = document.getElementById('langSelect').value;
+      projects.forEach(p => {
+        L.marker([p.lat, p.lng])
+          .addTo(map)
+          .bindTooltip(translations[p.name]?.[lang] || p.name)
+          .on('click', () => window.location.href = p.link);
+      });
     }
-    let currentPage=1; const perPage=6;
-    function renderProjects(page=1) {
-      currentPage=page; const filter=areaFilter.value;
-      let list=projects.filter(p=>filter==='all'||p.area===filter);
-      const start=(page-1)*perPage, end=start+perPage;
-      const container=document.getElementById('projectList'); container.innerHTML='';
-      list.slice(start,end).forEach(p=>{ let d=document.createElement('div'); d.className='project'; d.innerHTML=`<h4 data-i18n="${p.name}">${p.name}</h4><p>地区: ${p.area}</p>`; d.onclick=()=>window.location.href=p.link; container.appendChild(d); });
-      const pag=document.getElementById('pagination'); pag.innerHTML='';
-      for(let i=1;i<=Math.ceil(list.length/perPage);i++){let b=document.createElement('button');b.textContent=i; b.onclick=()=>renderProjects(i); if(i===page){b.style.fontWeight='bold';} pag.appendChild(b);}    }
-    function applyFilter(){ renderProjects(1); }
-    function toggleCalculator(){ let c=document.getElementById('calculatorBox'); c.style.display=c.style.display==='block'?'none':'block'; }
-    function calculateLoan(){ const price=parseFloat(price.value), rate=parseFloat(rate.value)/100/12, years=parseInt(years.value), n=years*12;
-      const m=(price*rate*Math.pow(1+rate,n))/(Math.pow(1+rate,n)-1);
-      loanResult.textContent=isFinite(m)?`每月还款: RM ${m.toFixed(2)}`:'请输入有效数值'; }
-    function switchLang(){ const lang=langSelect.value;
-      document.documentElement.lang=lang;
-      document.getElementById('calcTitle').textContent=lang==='zh'?'房贷计算器':'Loan Calculator';
-      document.getElementById('labelPrice').textContent=lang==='zh'?'房价 (RM):':'Price (RM):';
-      document.getElementById('labelRate').textContent=lang==='zh'?'年利率 (%):':'Annual Rate (%):';
-      document.getElementById('labelYears').textContent=lang==='zh'?'贷款年限:':'Years:';
-      document.getElementById('calcButton').textContent=lang==='zh'?'计算':'Calculate';
+
+    function renderProjects(page = 1) {
+      currentPage = page;
+      const lang = document.getElementById('langSelect').value;
+      const filter = document.getElementById('areaFilter').value;
+      const list = projects.filter(p => filter === 'all' || p.area === filter);
+      const start = (page - 1) * perPage, end = start + perPage;
+      const container = document.getElementById('projectList');
+      container.innerHTML = '';
+      list.slice(start, end).forEach(p => {
+        const d = document.createElement('div');
+        d.className = 'project';
+        d.innerHTML = `<h4>${translations[p.name]?.[lang] || p.name}</h4><p>${lang === 'zh' ? '地区' : 'Area'}: ${p.area}</p>`;
+        d.onclick = () => window.location.href = p.link;
+        container.appendChild(d);
+      });
+      const pag = document.getElementById('pagination');
+      pag.innerHTML = '';
+      for (let i = 1; i <= Math.ceil(list.length / perPage); i++) {
+        const b = document.createElement('button');
+        b.textContent = i;
+        b.onclick = () => renderProjects(i);
+        if (i === page) b.style.fontWeight = 'bold';
+        pag.appendChild(b);
+      }
     }
+
+    function applyFilter() { renderProjects(1); }
+
+    function toggleCalculator() {
+      const c = document.getElementById('calculatorBox');
+      c.style.display = c.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function calculateLoan() {
+      const price = parseFloat(price.value),
+            rate = parseFloat(rate.value) / 100 / 12,
+            years = parseInt(years.value), n = years * 12;
+      const m = (price * rate * Math.pow(1 + rate, n)) / (Math.pow(1 + rate, n) - 1);
+      loanResult.textContent = isFinite(m) ? `每月还款: RM ${m.toFixed(2)}` : '请输入有效数值';
+    }
+
+    function switchLang() {
+      const lang = document.getElementById('langSelect').value;
+      document.documentElement.lang = lang;
+      document.getElementById('calcTitle').textContent = lang === 'zh' ? '房贷计算器' : 'Loan Calculator';
+      document.getElementById('labelPrice').textContent = lang === 'zh' ? '房价 (RM):' : 'Price (RM):';
+      document.getElementById('labelRate').textContent = lang === 'zh' ? '年利率 (%):' : 'Annual Rate (%):';
+      document.getElementById('labelYears').textContent = lang === 'zh' ? '贷款年限:' : 'Years:';
+      document.getElementById('calcButton').textContent = lang === 'zh' ? '计算' : 'Calculate';
+
+      populateFilters();
+      renderProjects(currentPage);
+      map.remove(); map = null; renderMap();
+    }
+
     loadProjects();
   </script>
 </body>
