@@ -16,10 +16,14 @@ document.getElementById("login-form").addEventListener("submit", async function 
     const data = await response.json();
 
     if (response.ok) {
+      // 登录成功：储存 Token
       localStorage.setItem("access_token", data.access_token);
       alert("Login successful!");
+
+      // ✅ 登录成功后跳转到项目管理页面
       window.location.href = "admin.html";
     } else {
+      // 登录失败：提示错误信息
       alert("Login failed. Please check your credentials.");
     }
   } catch (error) {
