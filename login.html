@@ -12,32 +12,52 @@
         <input type="password" id="password" placeholder="Password" required><br><br>
         <button type="submit">Login</button>
     </form>
-    
+
     <!-- axios -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-    <!-- 如果你已经创建 login.js 文件，可以使用这一行连接外部脚本 -->
-    <script src="login.js"></script>
-
-    <!-- 如果你要保留内联 JS 作为 fallback 或测试用，也可以保留 -->
     <script>
         document.getElementById('login-form').addEventListener('submit', function(event) {
             event.preventDefault();
             
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-            
+
+            // 先尝试登录
             axios.post('https://mydreamhouse-backend.onrender.com/login', {
-                username: username,
-                password: password
+                username,
+                password
             })
             .then(response => {
                 const token = response.data.access_token;
                 localStorage.setItem('token', token);
-                window.location.href = '/projects'; // Redirect to projects page after successful login
+                window.location.href = '/projects'; // 登录成功，跳转页面
             })
             .catch(error => {
-                alert('Login failed. Please check your credentials.');
+                if (error.response && error.response.status === 401) {
+                    // 登录失败 → 自动尝试注册
+                    axios.post('https://mydreamhouse-backend.onrender.com/register', {
+                        username,
+                        password
+                    })
+                    .then(() => {
+                        // 注册成功 → 再尝试登录
+                        return axios.post('https://mydreamhouse-backend.onrender.com/login', {
+                            username,
+                            password
+                        });
+                    })
+                    .then(response => {
+                        const token = response.data.access_token;
+                        localStorage.setItem('token', token);
+                        window.location.href = '/projects';
+                    })
+                    .catch(err => {
+                        alert('自动注册或登录失败，请联系管理员');
+                    });
+                } else {
+                    alert('登录失败，请稍后重试');
+                }
             });
         });
     </script>
