@@ -9,17 +9,26 @@
 <body>
     <h2>Your Projects</h2>
     <button onclick="logout()">Logout</button>
+
     <div id="projects-list">Loading...</div>
+
+    <h3>Add New Project</h3>
+    <form id="new-project-form">
+        <input type="text" id="title" placeholder="Project Title" required><br><br>
+        <textarea id="content" placeholder="Project Content" required></textarea><br><br>
+        <button type="submit">Add Project</button>
+    </form>
 
     <script>
         const token = localStorage.getItem('token');
+        const projectsList = document.getElementById('projects-list');
 
         function logout() {
             localStorage.removeItem('token');
             window.location.href = '/login.html';
         }
 
-        if (token) {
+        function loadProjects() {
             axios.get('https://mydreamhouse-backend.onrender.com/projects', {
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -27,8 +36,7 @@
             })
             .then(response => {
                 const projects = response.data;
-                const projectsList = document.getElementById('projects-list');
-                projectsList.innerHTML = ''; // 清空 loading 文案
+                projectsList.innerHTML = '';
 
                 if (projects.length === 0) {
                     projectsList.textContent = 'No projects found.';
@@ -43,12 +51,41 @@
             })
             .catch(error => {
                 console.error(error);
-                alert('Failed to load projects. Token might be expired or invalid.');
+                alert('Failed to load projects. Please log in again.');
             });
-        } else {
+        }
+
+        if (!token) {
             alert('You are not logged in!');
             window.location.href = '/login.html';
+        } else {
+            loadProjects();
         }
+
+        document.getElementById('new-project-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+
+            axios.post('https://mydreamhouse-backend.onrender.com/projects', {
+                title: title,
+                content: content
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                alert('Project added!');
+                document.getElementById('new-project-form').reset();
+                loadProjects(); // refresh list
+            })
+            .catch(error => {
+                console.error(error);
+                alert('Failed to add project.');
+            });
+        });
     </script>
 </body>
 </html>
