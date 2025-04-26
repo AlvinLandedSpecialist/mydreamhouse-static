@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Login</title>
 </head>
 <body>
@@ -16,47 +16,46 @@
     <!-- axios -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
+    <!-- 自动登录/注册脚本 -->
     <script>
         document.getElementById('login-form').addEventListener('submit', function(event) {
             event.preventDefault();
-            
+
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
-            // 先尝试登录
+            // 第一次尝试登录
             axios.post('https://mydreamhouse-backend.onrender.com/login', {
-                username,
-                password
+                username: username,
+                password: password
             })
             .then(response => {
+                // 登录成功，保存 token 并跳转
                 const token = response.data.access_token;
                 localStorage.setItem('token', token);
-                window.location.href = '/projects'; // 登录成功，跳转页面
+                window.location.href = '/projects.html';  // 跳转到项目页面
             })
             .catch(error => {
                 if (error.response && error.response.status === 401) {
-                    // 登录失败 → 自动尝试注册
+                    // 登录失败，尝试注册
                     axios.post('https://mydreamhouse-backend.onrender.com/register', {
-                        username,
-                        password
-                    })
-                    .then(() => {
-                        // 注册成功 → 再尝试登录
+                        username: username,
+                        password: password
+                    }).then(() => {
+                        // 注册成功，再尝试登录
                         return axios.post('https://mydreamhouse-backend.onrender.com/login', {
-                            username,
-                            password
+                            username: username,
+                            password: password
                         });
-                    })
-                    .then(response => {
+                    }).then(response => {
                         const token = response.data.access_token;
                         localStorage.setItem('token', token);
-                        window.location.href = '/projects';
-                    })
-                    .catch(err => {
-                        alert('自动注册或登录失败，请联系管理员');
+                        window.location.href = '/projects.html';  // 跳转到项目页面
+                    }).catch(err => {
+                        alert('注册或自动登录失败，请检查信息');
                     });
                 } else {
-                    alert('登录失败，请稍后重试');
+                    alert('登录失败，请检查用户名或密码');
                 }
             });
         });
