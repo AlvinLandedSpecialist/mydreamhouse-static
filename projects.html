@@ -7,7 +7,25 @@
 </head>
 <body>
   <h2>Your Projects</h2>
-  
+
+  <!-- Filter Controls -->
+  <div id="filter-controls">
+    <label for="filter-price">Price Range:</label>
+    <select id="filter-price">
+      <option value="all">All</option>
+      <option value="low">Low (< $1000)</option>
+      <option value="mid">Medium ($1000 - $5000)</option>
+      <option value="high">High (> $5000)</option>
+    </select>
+
+    <label for="filter-youtube">Has YouTube Link:</label>
+    <select id="filter-youtube">
+      <option value="all">All</option>
+      <option value="yes">Yes</option>
+      <option value="no">No</option>
+    </select>
+  </div>
+
   <!-- Projects List -->
   <div id="projects-list"></div>
 
@@ -47,9 +65,21 @@
       window.location.href = '/login.html';
     }
 
-    // Load projects with pagination
+    // Load projects with pagination and filtering
     function loadProjects(page = 1) {
-      axios.get(`${api}/projects?page=${page}`, {
+      const priceFilter = document.getElementById('filter-price').value;
+      const youtubeFilter = document.getElementById('filter-youtube').value;
+
+      let query = `?page=${page}`;
+      
+      if (priceFilter !== 'all') {
+        query += `&price=${priceFilter}`;
+      }
+      if (youtubeFilter !== 'all') {
+        query += `&youtube=${youtubeFilter}`;
+      }
+
+      axios.get(`${api}/projects${query}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
