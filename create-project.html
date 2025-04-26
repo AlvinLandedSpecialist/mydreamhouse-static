@@ -7,7 +7,9 @@
 </head>
 <body>
   <h2>创建新项目</h2>
-  <form id="projectForm">
+  
+  <!-- Project Creation Form -->
+  <form id="projectForm" enctype="multipart/form-data">
     <label>标题:</label><br/>
     <input type="text" id="title" required><br/><br/>
 
@@ -20,12 +22,75 @@
     <label>YouTube 视频链接:</label><br/>
     <input type="url" id="youtube_link"><br/><br/>
 
+    <!-- File Upload for Cover Photo -->
+    <label for="cover-photo">封面照片:</label><br/>
+    <input type="file" id="cover-photo" accept="image/*" required><br/><br/>
+
+    <!-- File Upload for Additional Photos (6 max) -->
+    <label for="additional-photos">附加照片 (最多6张):</label><br/>
+    <input type="file" id="additional-photos" accept="image/*" multiple><br/><br/>
+
     <button type="submit">提交项目</button>
   </form>
 
   <p id="message"></p>
+
   <button onclick="logout()">登出</button>
 
-  <script src="create-project.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    const token = localStorage.getItem('token');
+    const api = 'https://mydreamhouse-backend.onrender.com';
+
+    // Check if user is logged in
+    if (!token) {
+      alert('你没有登录！');
+      window.location.href = '/login.html';  // Redirect to login if not logged in
+    }
+
+    // Logout function
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';  // Redirect to login page
+    }
+
+    // Handle project creation form submission
+    document.getElementById('projectForm').addEventListener('submit', function (e) {
+      e.preventDefault();  // Prevent default form submission
+
+      const title = document.getElementById('title').value;
+      const content = document.getElementById('content').value;
+      const price = document.getElementById('price').value;
+      const youtubeLink = document.getElementById('youtube_link').value;
+      const coverPhoto = document.getElementById('cover-photo').files[0]; // Get cover photo
+      const additionalPhotos = document.getElementById('additional-photos').files; // Get additional photos
+
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('content', content);
+      formData.append('price', price);
+      formData.append('youtube_link', youtubeLink);
+      formData.append('cover_photo', coverPhoto);  // Append cover photo
+      for (let i = 0; i < additionalPhotos.length; i++) {
+        formData.append('additional_photos', additionalPhotos[i]);  // Append additional photos
+      }
+
+      // Send POST request to create the project
+      axios.post(`${api}/projects`, formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      .then(response => {
+        document.getElementById('message').textContent = '项目创建成功！';
+        document.getElementById('projectForm').reset();  // Reset form fields
+      })
+      .catch(error => {
+        console.error('项目创建失败', error);
+        document.getElementById('message').textContent = '项目创建失败！';
+      });
+    });
+  </script>
 </body>
 </html>
