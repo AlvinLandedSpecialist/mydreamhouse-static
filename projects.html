@@ -3,11 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Projects</title>
+  <title>Your Projects</title>
 </head>
 <body>
   <h2>Your Projects</h2>
+  
+  <!-- Projects List -->
   <div id="projects-list"></div>
+
+  <!-- Pagination Controls -->
+  <div id="pagination-controls">
+    <button id="prev-page" onclick="loadProjects(currentPage - 1)">Previous</button>
+    <span id="page-info">Page 1</span>
+    <button id="next-page" onclick="loadProjects(currentPage + 1)">Next</button>
+  </div>
 
   <h3>Create New Project</h3>
   <form id="create-form">
@@ -18,26 +27,38 @@
     <button type="submit">Create</button>
   </form>
 
-  <!-- axios -->
+  <!-- Axios -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
   <script>
     const token = localStorage.getItem('token');
     const api = 'https://mydreamhouse-backend.onrender.com';
 
+    let currentPage = 1;
+    let totalPages = 1;
+
+    // Check if user is logged in
     if (!token) {
       alert('You are not logged in!');
       window.location.href = '/login.html';
     }
 
-    function loadProjects() {
-      axios.get(`${api}/projects`, {
+    // Load projects with pagination
+    function loadProjects(page = 1) {
+      axios.get(`${api}/projects?page=${page}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       })
       .then(response => {
-        const projects = response.data;
+        const projects = response.data.projects;
+        totalPages = response.data.total_pages;
+        currentPage = response.data.current_page;
+
+        // Update page info
+        document.getElementById('page-info').textContent = `Page ${currentPage} of ${totalPages}`;
+
+        // Update projects list
         const list = document.getElementById('projects-list');
         list.innerHTML = '';
 
@@ -54,6 +75,10 @@
           `;
           list.appendChild(div);
         });
+
+        // Disable buttons if on first/last page
+        document.getElementById('prev-page').disabled = currentPage === 1;
+        document.getElementById('next-page').disabled = currentPage === totalPages;
       })
       .catch(error => {
         alert('Failed to load projects.');
@@ -61,6 +86,7 @@
       });
     }
 
+    // Delete project
     function deleteProject(id) {
       if (!confirm('Are you sure you want to delete this project?')) return;
 
@@ -69,11 +95,12 @@
       })
       .then(() => {
         alert('Deleted successfully');
-        loadProjects();
+        loadProjects(currentPage);  // Reload current page
       })
       .catch(() => alert('Delete failed'));
     }
 
+    // Edit project
     function editProject(id) {
       const newTitle = prompt("New title:");
       const newContent = prompt("New content:");
@@ -90,11 +117,12 @@
       })
       .then(() => {
         alert('Updated successfully');
-        loadProjects();
+        loadProjects(currentPage);  // Reload current page
       })
       .catch(() => alert('Update failed'));
     }
 
+    // Create new project
     document.getElementById('create-form').addEventListener('submit', function (e) {
       e.preventDefault();
       const title = document.getElementById('title').value;
@@ -113,13 +141,13 @@
       .then(() => {
         alert('Project created');
         this.reset();
-        loadProjects();
+        loadProjects(currentPage);  // Reload current page
       })
       .catch(() => alert('Failed to create project'));
     });
 
-    // 初始加载
-    loadProjects();
+    // Initial load of projects
+    loadProjects(currentPage);
   </script>
 </body>
 </html>
