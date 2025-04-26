@@ -25,6 +25,11 @@
     const token = localStorage.getItem('token');
     const api = 'https://mydreamhouse-backend.onrender.com';
 
+    if (!token) {
+      alert('You are not logged in!');
+      window.location.href = '/login.html';
+    }
+
     function loadProjects() {
       axios.get(`${api}/projects`, {
         headers: {
@@ -43,7 +48,7 @@
             <strong>${p.title}</strong><br>
             ${p.content}<br>
             Price: ${p.price}<br>
-            YouTube: <a href="${p.youtube_link}" target="_blank">${p.youtube_link}</a><br>
+            YouTube: ${p.youtube_link ? `<a href="${p.youtube_link}" target="_blank">${p.youtube_link}</a>` : 'N/A'}<br>
             <button onclick="editProject(${p.id})">Edit</button>
             <button onclick="deleteProject(${p.id})">Delete</button>
           `;
@@ -52,6 +57,7 @@
       })
       .catch(error => {
         alert('Failed to load projects.');
+        console.error(error);
       });
     }
 
@@ -112,12 +118,8 @@
       .catch(() => alert('Failed to create project'));
     });
 
-    if (token) {
-      loadProjects();
-    } else {
-      alert('You are not logged in!');
-      window.location.href = '/login.html';
-    }
+    // 初始加载
+    loadProjects();
   </script>
 </body>
 </html>
