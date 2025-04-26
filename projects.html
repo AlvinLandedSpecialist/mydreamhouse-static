@@ -24,6 +24,10 @@
     <textarea id="content" placeholder="Content" required></textarea><br>
     <input type="text" id="price" placeholder="Price" required><br>
     <input type="text" id="youtube_link" placeholder="YouTube Link (optional)"><br>
+    
+    <!-- File Upload -->
+    <input type="file" id="photo" accept="image/*"><br>
+
     <button type="submit">Create</button>
   </form>
 
@@ -70,6 +74,7 @@
             ${p.content}<br>
             Price: ${p.price}<br>
             YouTube: ${p.youtube_link ? `<a href="${p.youtube_link}" target="_blank">${p.youtube_link}</a>` : 'N/A'}<br>
+            <img src="${p.image_url}" alt="Project Image" width="100"><br>
             <button onclick="editProject(${p.id})">Edit</button>
             <button onclick="deleteProject(${p.id})">Delete</button>
           `;
@@ -129,14 +134,20 @@
       const content = document.getElementById('content').value;
       const price = document.getElementById('price').value;
       const youtube = document.getElementById('youtube_link').value;
+      const photo = document.getElementById('photo').files[0]; // Get uploaded file
 
-      axios.post(`${api}/projects`, {
-        title: title,
-        content: content,
-        price: price,
-        youtube_link: youtube
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('content', content);
+      formData.append('price', price);
+      formData.append('youtube_link', youtube);
+      if (photo) formData.append('photo', photo);  // Append photo if exists
+
+      axios.post(`${api}/projects`, formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'  // Use multipart/form-data for file upload
+        }
       })
       .then(() => {
         alert('Project created');
