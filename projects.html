@@ -1,17 +1,24 @@
-<!-- projects.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projects</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
     <h2>Your Projects</h2>
-    <div id="projects-list"></div>
+    <button onclick="logout()">Logout</button>
+    <div id="projects-list">Loading...</div>
 
     <script>
         const token = localStorage.getItem('token');
+
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        }
+
         if (token) {
             axios.get('https://mydreamhouse-backend.onrender.com/projects', {
                 headers: {
@@ -21,6 +28,13 @@
             .then(response => {
                 const projects = response.data;
                 const projectsList = document.getElementById('projects-list');
+                projectsList.innerHTML = ''; // 清空 loading 文案
+
+                if (projects.length === 0) {
+                    projectsList.textContent = 'No projects found.';
+                    return;
+                }
+
                 projects.forEach(project => {
                     const projectDiv = document.createElement('div');
                     projectDiv.textContent = `${project.title}: ${project.content}`;
@@ -28,10 +42,12 @@
                 });
             })
             .catch(error => {
-                alert('Failed to load projects. Please try again.');
+                console.error(error);
+                alert('Failed to load projects. Token might be expired or invalid.');
             });
         } else {
             alert('You are not logged in!');
+            window.location.href = '/login.html';
         }
     </script>
 </body>
