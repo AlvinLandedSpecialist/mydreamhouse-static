@@ -12,7 +12,7 @@ if (!token) {
 // 加载项目列表
 async function loadProjects() {
     try {
-        const response = await fetch(`${apiUrl}/api/projects`, {
+        const response = await fetch(`${apiUrl}/projects`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 
@@ -20,7 +20,6 @@ async function loadProjects() {
             const errorData = await response.json();
             alert(`Failed to load projects: ${response.status} ${errorData.msg || ''}`);
             if (response.status === 401) {
-                // Token失效或无效，跳回登录
                 window.location.href = 'login.html';
             }
             return;
@@ -37,10 +36,21 @@ async function loadProjects() {
 function displayProjects(projects) {
     const projectList = document.getElementById('project-list');
     projectList.innerHTML = '';
+
     projects.forEach(project => {
         const div = document.createElement('div');
         div.className = 'project-item';
-        div.innerHTML = `<h3>${project.title}</h3><p>${project.price}</p>`;
+        div.innerHTML = `
+            <h3>${project.title}</h3>
+            <p>价格: $${project.price}</p>
+            <p>${project.content}</p>
+            ${project.cover_photo_url ? `<img src="${apiUrl}${project.cover_photo_url}" width="200">` : ''}
+            <br>
+            ${project.images && project.images.length > 0 ? project.images.map(img => `<img src="${apiUrl}${img.image_url}" width="100" style="margin:5px;">`).join('') : ''}
+            <br>
+            <button onclick="deleteProject(${project.id})">删除项目</button>
+            <hr>
+        `;
         projectList.appendChild(div);
     });
 }
@@ -52,7 +62,7 @@ async function createProject(event) {
     const formData = new FormData(projectForm);
 
     try {
-        const response = await fetch(`${apiUrl}/api/projects`, {
+        const response = await fetch(`${apiUrl}/projects`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${token}` },
             body: formData
@@ -62,7 +72,6 @@ async function createProject(event) {
             const errorData = await response.json();
             alert(`Failed to create project: ${response.status} ${errorData.msg || ''}`);
             if (response.status === 401) {
-                // Token失效或无效，跳回登录
                 window.location.href = 'login.html';
             }
             return;
@@ -70,10 +79,41 @@ async function createProject(event) {
 
         alert('Project created successfully!');
         projectForm.reset();
-        loadProjects(); // 刷新列表
+        loadProjects();
     } catch (error) {
         alert('Error creating project: ' + error.message);
     }
+}
+
+// 删除项目
+async function deleteProject(projectId) {
+    if (!confirm('确定要删除这个项目吗？')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${apiUrl}/projects/${projectId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert('删除成功！');
+            loadProjects();
+        } else {
+            alert(result.msg || '删除失败');
+        }
+    } catch (error) {
+        alert('Error deleting project: ' + error.message);
+    }
+}
+
+// 登出功能
+function logout() {
+    localStorage.removeItem('token');
+    window.location.href = 'login.html';
 }
 
 // 页面加载时初始化
