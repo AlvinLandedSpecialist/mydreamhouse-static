@@ -21,8 +21,8 @@ document.getElementById("login-form").addEventListener("submit", async function 
 
       alert("Login successful!");
 
-      // ✅ 登录成功后跳转到项目管理页面
-      window.location.href = "manage-projects.html"; // 如果你已经上传了这个文件
+      // ✅ 登录成功后跳转到管理页面 admin.html
+      window.location.href = "admin.html"; // 已更新为 admin.html
     } else {
       // 登录失败：提示错误信息
       alert("Login failed. Please check your credentials.");
