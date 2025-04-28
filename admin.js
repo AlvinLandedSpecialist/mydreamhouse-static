@@ -1,12 +1,10 @@
-// admin.js
-
 const apiUrl = 'https://mydreamhouse-backend.onrender.com';
 const token = localStorage.getItem('token');
 
 // 如果 token 不存在，自动跳转回登录页
 if (!token) {
     alert('No token found, please login again.');
-    window.location.href = 'login.html';
+    window.location.href = 'login.html'; // 登录失败时跳转到登录页
 }
 
 // 加载项目列表
@@ -20,7 +18,7 @@ async function loadProjects() {
             const errorData = await response.json();
             alert(`Failed to load projects: ${response.status} ${errorData.msg || ''}`);
             if (response.status === 401) {
-                window.location.href = 'login.html';
+                window.location.href = 'login.html'; // token 失效时跳转到登录页
             }
             return;
         }
@@ -72,14 +70,14 @@ async function createProject(event) {
             const errorData = await response.json();
             alert(`Failed to create project: ${response.status} ${errorData.msg || ''}`);
             if (response.status === 401) {
-                window.location.href = 'login.html';
+                window.location.href = 'login.html'; // token 失效时跳转到登录页
             }
             return;
         }
 
         alert('Project created successfully!');
         projectForm.reset();
-        loadProjects();
+        loadProjects(); // 刷新列表
     } catch (error) {
         alert('Error creating project: ' + error.message);
     }
@@ -101,7 +99,7 @@ async function deleteProject(projectId) {
 
         if (response.ok) {
             alert('删除成功！');
-            loadProjects();
+            loadProjects(); // 刷新列表
         } else {
             alert(result.msg || '删除失败');
         }
@@ -112,16 +110,16 @@ async function deleteProject(projectId) {
 
 // 登出功能
 function logout() {
-    localStorage.removeItem('token');
-    window.location.href = 'login.html';
+    localStorage.removeItem('token'); // 删除 token
+    window.location.href = 'login.html'; // 跳转回登录页
 }
 
 // 页面加载时初始化
 document.addEventListener('DOMContentLoaded', function () {
-    loadProjects();
+    loadProjects(); // 加载项目列表
 
     const projectForm = document.getElementById('project-form');
     if (projectForm) {
-        projectForm.addEventListener('submit', createProject);
+        projectForm.addEventListener('submit', createProject); // 绑定新项目提交事件
     }
 });
