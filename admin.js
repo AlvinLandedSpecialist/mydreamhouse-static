@@ -1,137 +1,78 @@
 const apiUrl = 'https://mydreamhouse-backend.onrender.com';
 const token = localStorage.getItem('token');
 
-// 如果 token 不存在，自动跳转回登录页
 if (!token) {
-    alert('No token found, please login again.');
-    window.location.href = 'login.html'; // 登录失败时跳转到登录页
+  alert('No token, please login.');
+  window.location.href = 'login.html';
 }
 
-// 加载项目列表
 async function loadProjects() {
-    try {
-        const response = await fetch(`${apiUrl}/projects`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (!response.ok) {
-    let errorData = {};
-    try {
-        // 尝试解析错误响应
-        errorData = await response.json();
-    } catch (error) {
-        // 如果解析失败，打印日志
-        console.error("Error parsing error response:", error);
-        errorData = { msg: "Unexpected error occurred." }; // 默认消息
-    }
-
-    // 提示错误信息
-    alert(`Failed to load projects: ${response.status} ${errorData.msg || ''}`);
-
-    // 如果 token 失效（401），跳转到登录页
-    if (response.status === 401) {
-        window.location.href = 'login.html'; 
-    }
-    return;
-}
-
-        const projects = await response.json();
-        displayProjects(projects);
-    } catch (error) {
-        alert('Error loading projects: ' + error.message);
-    }
-}
-
-// 显示项目
-function displayProjects(projects) {
-    const projectList = document.getElementById('project-list');
-    projectList.innerHTML = '';
-
-    projects.forEach(project => {
-        const div = document.createElement('div');
-        div.className = 'project-item';
-        div.innerHTML = `
-            <h3>${project.title}</h3>
-            <p>价格: $${project.price}</p>
-            <p>${project.content}</p>
-            ${project.cover_photo_url ? `<img src="${apiUrl}${project.cover_photo_url}" width="200">` : ''}
-            <br>
-            ${project.images && project.images.length > 0 ? project.images.map(img => `<img src="${apiUrl}${img.image_url}" width="100" style="margin:5px;">`).join('') : ''}
-            <br>
-            <button onclick="deleteProject(${project.id})">删除项目</button>
-            <hr>
-        `;
-        projectList.appendChild(div);
+  try {
+    const response = await fetch(`${apiUrl}/projects`, {
+      headers: { 'Authorization': `Bearer ${token}` }
     });
-}
 
-// 提交新项目
-async function createProject(event) {
-    event.preventDefault();
-    const projectForm = document.getElementById('project-form');
-    const formData = new FormData(projectForm);
-
-    try {
-        const response = await fetch(`${apiUrl}/projects`, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` },
-            body: formData
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            alert(`Failed to create project: ${response.status} ${errorData.msg || ''}`);
-            if (response.status === 401) {
-                window.location.href = 'login.html'; // token 失效时跳转到登录页
-            }
-            return;
-        }
-
-        alert('Project created successfully!');
-        projectForm.reset();
-        loadProjects(); // 刷新列表
-    } catch (error) {
-        alert('Error creating project: ' + error.message);
-    }
-}
-
-// 删除项目
-async function deleteProject(projectId) {
-    if (!confirm('确定要删除这个项目吗？')) {
-        return;
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Load projects failed:', response.status, errorData);
+      alert(`Failed to load projects: ${response.status} ${errorData.msg || ''}`);
+      if (response.status === 401) window.location.href = 'login.html';
+      return;
     }
 
-    try {
-        const response = await fetch(`${apiUrl}/projects/${projectId}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            alert('删除成功！');
-            loadProjects(); // 刷新列表
-        } else {
-            alert(result.msg || '删除失败');
-        }
-    } catch (error) {
-        alert('Error deleting project: ' + error.message);
-    }
+    const projects = await response.json();
+    displayProjects(projects);
+  } catch (e) {
+    console.error('Fetch error:', e);
+    alert('Error loading projects: ' + e.message);
+  }
 }
 
-// 登出功能
-function logout() {
-    localStorage.removeItem('token'); // 删除 token
-    window.location.href = 'login.html'; // 跳转回登录页
+function displayProjects(projects) {
+  const projectList = document.getElementById('project-list');
+  projectList.innerHTML = '';
+  projects.forEach(p => {
+    projectList.insertAdjacentHTML('beforeend', `
+      <div class="project-item">
+        <h3>${p.title}</h3>
+        <p>¥${p.price}</p>
+        <p>${p.content}</p>
+        ${p.cover_photo_url ? `<img src="${apiUrl}${p.cover_photo_url}" width="200">` : ''}
+        <br>
+        ${p.images?.map(i=>`<img src="${apiUrl}${i.image_url}" width="100" style="margin:5px;">`).join('')}
+        <br>
+        <button onclick="deleteProject(${p.id})">删除项目</button>
+        <hr>
+      </div>
+    `);
+  });
 }
 
-// 页面加载时初始化
-document.addEventListener('DOMContentLoaded', function () {
-    loadProjects(); // 加载项目列表
+async function deleteProject(id) {
+  if (!confirm('确定删除？')) return;
+  const res = await fetch(`${apiUrl}/projects/${id}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  const j = await res.json();
+  if (res.ok) loadProjects();
+  else alert('Delete failed: ' + j.msg);
+}
 
-    const projectForm = document.getElementById('project-form');
-    if (projectForm) {
-        projectForm.addEventListener('submit', createProject); // 绑定新项目提交事件
-    }
+document.getElementById('project-form')?.addEventListener('submit', async e => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const res = await fetch(`${apiUrl}/projects`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}` },
+    body: fd
+  });
+  const j = await res.json();
+  if (res.ok) {
+    alert('Created!');
+    e.target.reset();
+    loadProjects();
+  } else alert('Create failed: ' + j.msg);
 });
+
+document.addEventListener('DOMContentLoaded', loadProjects);
