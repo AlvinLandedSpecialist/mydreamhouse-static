@@ -29,23 +29,29 @@ async function loadProjects() {
 }
 
 function displayProjects(projects) {
-  const projectList = document.getElementById('project-list');
-  projectList.innerHTML = '';
-  projects.forEach(p => {
-    projectList.insertAdjacentHTML('beforeend', `
-      <div class="project-item">
-        <h3>${p.title}</h3>
-        <p>¥${p.price}</p>
-        <p>${p.content}</p>
-        ${p.cover_photo_url ? `<img src="${apiUrl}${p.cover_photo_url}" width="200">` : ''}
-        <br>
-        ${p.images?.map(i=>`<img src="${apiUrl}${i.image_url}" width="100" style="margin:5px;">`).join('')}
-        <br>
-        <button onclick="deleteProject(${p.id})">删除项目</button>
-        <hr>
-      </div>
-    `);
-  });
+    const projectList = document.getElementById('project-list');
+    projectList.innerHTML = '';
+
+    if (Array.isArray(projects) && projects.length > 0) { // 确保 projects 是数组且有内容
+        projects.forEach(project => {
+            const div = document.createElement('div');
+            div.className = 'project-item';
+            div.innerHTML = `
+                <h3>${project.title}</h3>
+                <p>价格: $${project.price}</p>
+                <p>${project.content}</p>
+                ${project.cover_photo_url ? `<img src="${apiUrl}${project.cover_photo_url}" width="200">` : ''}
+                <br>
+                ${project.images && project.images.length > 0 ? project.images.map(img => `<img src="${apiUrl}${img.image_url}" width="100" style="margin:5px;">`).join('') : ''}
+                <br>
+                <button onclick="deleteProject(${project.id})">删除项目</button>
+                <hr>
+            `;
+            projectList.appendChild(div);
+        });
+    } else {
+        alert("No projects available.");
+    }
 }
 
 async function deleteProject(id) {
