@@ -17,7 +17,8 @@ document.getElementById("login-form").addEventListener("submit", async function 
 
     if (response.ok) {
       // 登录成功：储存 Token
-      localStorage.setItem("access_token", data.access_token);
+      localStorage.setItem("token", data.access_token);  // 存储 Token（不需要 stringify）
+
       alert("Login successful!");
 
       // ✅ 登录成功后跳转到项目管理页面
