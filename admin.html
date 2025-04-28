@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <title>后台管理</title>
@@ -10,16 +10,16 @@
   <button onclick="logout()">登出</button>
 
   <h3>新增项目</h3>
-  <form id="createProjectForm" enctype="multipart/form-data">
+  <form id="project-form" enctype="multipart/form-data">
     <input type="text" name="title" placeholder="项目标题" required><br><br>
     <input type="text" name="price" placeholder="价格" required><br><br>
     <textarea name="content" placeholder="项目内容" required></textarea><br><br>
     <input type="text" name="youtube_link" placeholder="YouTube 链接 (可选)"><br><br>
 
-    <label>上传封面图：</label>
+    <label>上传封面图：</label><br>
     <input type="file" name="cover_photo" accept="image/*" required><br><br>
 
-    <label>上传多张附加图片：</label>
+    <label>上传多张附加图片：</label><br>
     <input type="file" name="additional_photos" accept="image/*" multiple><br><br>
 
     <button type="submit">创建项目</button>
@@ -28,7 +28,7 @@
   <hr>
 
   <h3>我的项目列表</h3>
-  <div id="projects"></div>
+  <div id="project-list"></div>
 
   <script src="admin.js"></script>
 </body>
