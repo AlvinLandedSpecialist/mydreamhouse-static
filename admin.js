@@ -15,13 +15,25 @@ async function loadProjects() {
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
-            alert(`Failed to load projects: ${response.status} ${errorData.msg || ''}`);
-            if (response.status === 401) {
-                window.location.href = 'login.html'; // token 失效时跳转到登录页
-            }
-            return;
-        }
+    let errorData = {};
+    try {
+        // 尝试解析错误响应
+        errorData = await response.json();
+    } catch (error) {
+        // 如果解析失败，打印日志
+        console.error("Error parsing error response:", error);
+        errorData = { msg: "Unexpected error occurred." }; // 默认消息
+    }
+
+    // 提示错误信息
+    alert(`Failed to load projects: ${response.status} ${errorData.msg || ''}`);
+
+    // 如果 token 失效（401），跳转到登录页
+    if (response.status === 401) {
+        window.location.href = 'login.html'; 
+    }
+    return;
+}
 
         const projects = await response.json();
         displayProjects(projects);
