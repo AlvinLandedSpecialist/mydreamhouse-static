@@ -7,25 +7,27 @@ if (!token) {
 }
 
 async function loadProjects() {
-  try {
-    const response = await fetch(`${apiUrl}/projects`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
+    try {
+        const response = await fetch(`${apiUrl}/projects`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Load projects failed:', response.status, errorData);
-      alert(`Failed to load projects: ${response.status} ${errorData.msg || ''}`);
-      if (response.status === 401) window.location.href = 'login.html';
-      return;
+        const responseData = await response.json();
+        console.log('Response data:', responseData); // 打印返回的数据
+
+        if (!response.ok) {
+            alert(`Failed to load projects: ${response.status} ${responseData.msg || ''}`);
+            if (response.status === 401) {
+                window.location.href = 'login.html'; // token 失效时跳转到登录页
+            }
+            return;
+        }
+
+        const projects = Array.isArray(responseData) ? responseData : []; // 如果返回的不是数组，使用空数组
+        displayProjects(projects);
+    } catch (error) {
+        alert('Error loading projects: ' + error.message);
     }
-
-    const projects = await response.json();
-    displayProjects(projects);
-  } catch (e) {
-    console.error('Fetch error:', e);
-    alert('Error loading projects: ' + e.message);
-  }
 }
 
 function displayProjects(projects) {
